@@ -34,7 +34,7 @@ export function Toolbar() {
   const handleSave = () => {
     // TODO: 实现保存功能
     showToast('项目已保存', 'success')
-    console.log('保存项目')
+    // 保存项目逻辑
   }
 
   const handleExport = () => {
@@ -54,7 +54,7 @@ export function Toolbar() {
       URL.revokeObjectURL(url)
       
       showToast('代码导出成功', 'success')
-      console.log('导出 TailwindCSS React 代码成功')
+      // 导出成功
     } catch (error) {
       showToast('代码导出失败', 'error')
       console.error('导出代码失败:', error)

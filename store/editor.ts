@@ -361,6 +361,13 @@ export const useEditorStore = create<EditorState>()(
     
     saveToHistory: () => {
       const { components, history, historyIndex } = get()
+      
+      // 检查是否与当前历史记录相同，避免重复保存
+      const currentHistory = history[historyIndex]
+      if (currentHistory && JSON.stringify(currentHistory) === JSON.stringify(components)) {
+        return
+      }
+      
       const newHistory = history.slice(0, historyIndex + 1)
       newHistory.push([...components])
       
@@ -434,19 +441,14 @@ export const useEditorStore = create<EditorState>()(
     precompileStyles: () => {
       const { components } = get()
       
-      console.log('开始样式预编译，原始组件数量:', components.length)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('开始样式预编译，原始组件数量:', components.length)
+      }
       
       const precompileComponentStyles = (comps: Component[]): Component[] => {
         return comps.map(comp => {
           // 将样式转换为 TailwindCSS 类名
           const className = styleToTailwind(comp.style)
-          
-          console.log('预编译组件:', {
-            id: comp.id,
-            type: comp.type,
-            originalStyle: comp.style,
-            generatedClassName: className
-          })
           
           const updatedComp: Component = {
             ...comp,
@@ -465,7 +467,9 @@ export const useEditorStore = create<EditorState>()(
       const updatedComponents = precompileComponentStyles(components)
       set({ components: updatedComponents })
       
-      console.log('样式预编译完成，更新后的组件:', updatedComponents)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('样式预编译完成')
+      }
     },
   }))
 ) 

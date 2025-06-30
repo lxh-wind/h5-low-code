@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  important: true, // 添加 important 选项
+  important: true,
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -12,12 +12,44 @@ module.exports = {
     './types/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   safelist: [
-    // 允许所有任意值类名 - 更激进的匹配策略
+    // 动态生成的任意值类名 - 修复正则表达式
     {
-      pattern: /.*/,  // 匹配所有类名（开发阶段使用）
+      pattern: /^m[trbl]?-\[[\d.]+(?:px|rem|em|%)\]$/,
+      variants: ['hover', 'focus', 'active']
     },
-    // 保留一些常用的固定类名
-    // 间距类名
+    {
+      pattern: /^p[trbl]?-\[[\d.]+(?:px|rem|em|%)\]$/,
+      variants: ['hover', 'focus', 'active']
+    },
+    {
+      pattern: /^w-\[[\d.]+(?:px|rem|em|%|vw|vh)\]$/,
+      variants: ['hover', 'focus', 'active']
+    },
+    {
+      pattern: /^h-\[[\d.]+(?:px|rem|em|%|vw|vh)\]$/,
+      variants: ['hover', 'focus', 'active']
+    },
+    {
+      pattern: /^(?:min-|max-)?[wh]-\[[\d.]+(?:px|rem|em|%|vw|vh)\]$/,
+      variants: ['hover', 'focus', 'active']
+    },
+    {
+      pattern: /^(?:bg|text|border)-\[#[0-9a-fA-F]{3,6}\]$/,
+      variants: ['hover', 'focus', 'active']
+    },
+    {
+      pattern: /^text-\[[\d.]+(?:px|rem|em)\]$/,
+      variants: ['hover', 'focus', 'active']
+    },
+    {
+      pattern: /^border(?:-[trbl])?-\[[\d.]+(?:px|rem|em)\]$/,
+      variants: ['hover', 'focus', 'active']
+    },
+    {
+      pattern: /^rounded(?:-[trbl])?-\[[\d.]+(?:px|rem|em)\]$/,
+      variants: ['hover', 'focus', 'active']
+    },
+    // 常用的固定类名
     'mt-0', 'mt-1', 'mt-2', 'mt-3', 'mt-4', 'mt-5', 'mt-6', 'mt-8', 'mt-12', 'mt-16',
     'mr-0', 'mr-1', 'mr-2', 'mr-3', 'mr-4', 'mr-5', 'mr-6', 'mr-8', 'mr-12', 'mr-16',
     'mb-0', 'mb-1', 'mb-2', 'mb-3', 'mb-4', 'mb-5', 'mb-6', 'mb-8', 'mb-12', 'mb-16',
@@ -94,7 +126,5 @@ module.exports = {
       }
     },
   },
-  plugins: [
-    require('@tailwindcss/line-clamp'),
-  ],
+  plugins: [],
 } 

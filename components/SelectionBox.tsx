@@ -142,7 +142,7 @@ export function SelectionBox({ children, componentId, isSelected, componentName 
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation()
-    console.log('复制组件:', componentId)
+    // TODO: 实现复制功能
   }
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -152,7 +152,7 @@ export function SelectionBox({ children, componentId, isSelected, componentName 
 
   const handleMove = (e: React.MouseEvent) => {
     e.stopPropagation()
-    console.log('移动组件:', componentId)
+    // TODO: 实现移动功能
   }
 
   const renderToolbar = () => {

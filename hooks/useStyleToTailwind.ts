@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { styleToTailwind } from '@/lib/utils'
 
 interface StyleObject {
   [key: string]: string | undefined
@@ -9,6 +10,20 @@ interface TailwindMapping {
 }
 
 export function useStyleToTailwind(style: StyleObject = {}) {
+  // 使用 useMemo 缓存转换结果，避免重复计算
+  const className = useMemo(() => {
+    // 如果样式为空，直接返回空字符串
+    if (!style || Object.keys(style).length === 0) {
+      return ''
+    }
+    
+    return styleToTailwind(style)
+  }, [style])
+  
+  return className
+}
+
+export function useStyleToTailwindOld(style: StyleObject = {}) {
   // TailwindCSS 映射规则 - 直接生成任意值类名
   const tailwindMapping: TailwindMapping = useMemo(() => ({
     // 间距映射 - 直接使用任意值语法

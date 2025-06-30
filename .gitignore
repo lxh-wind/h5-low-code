@@ -42,3 +42,12 @@ tailwind-playground.css
 # yalc
 /.yalc
 yalc.lock
+
+# 性能优化 - 缓存目录
+node_modules/.cache
+.turbo
+.swc
+*.tsbuildinfo
+
+# macOS
+.DS_Store

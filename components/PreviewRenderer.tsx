@@ -10,8 +10,8 @@ interface PreviewRendererProps {
 export function PreviewRenderer({ component }: PreviewRendererProps) {
   const { type, props, className, style, children } = component
   
-  // 开发环境下的调试信息
-  if (process.env.NODE_ENV === 'development') {
+  // 开发环境下的调试信息（仅在需要时启用）
+  if (process.env.NODE_ENV === 'development' && process.env.DEBUG_RENDERER) {
     console.log('PreviewRenderer Debug:', {
       componentType: type,
       componentId: component.id,
@@ -56,8 +56,8 @@ export function PreviewRenderer({ component }: PreviewRendererProps) {
       })
     } : {}
 
-    // 开发环境下输出最终使用的样式
-    if (process.env.NODE_ENV === 'development') {
+    // 开发环境下输出最终使用的样式（仅在调试时启用）
+    if (process.env.NODE_ENV === 'development' && process.env.DEBUG_RENDERER) {
       console.log('Final styles for', component.id, {
         className: combinedClassName,
         inlineStyle,
