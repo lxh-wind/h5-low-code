@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Page } from '@/types/schema'
 import { useFavoriteStore } from '@/store/favorites'
 import { usePageStore } from '@/store/pages'
 import { useTimeFormat } from '@/hooks/useTimeFormat'
@@ -17,7 +18,7 @@ import {
 } from 'lucide-react'
 
 interface PageListItemProps {
-  page: any
+  page: Page
 }
 
 export function PageListItem({ page }: PageListItemProps) {

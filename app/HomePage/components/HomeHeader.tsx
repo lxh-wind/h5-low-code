@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui'
 import { Skeleton } from '@/components/Skeleton'
 import { 
@@ -25,14 +25,8 @@ export function HomeHeader({
   onImportTemplate,
   onCreatePage
 }: HomeHeaderProps) {
-  const [isMounted, setIsMounted] = useState(false)
-  const [currentDate, setCurrentDate] = useState('')
-
-  useEffect(() => {
-    setIsMounted(true)
-    // 只在客户端格式化日期
-    setCurrentDate(new Date().toLocaleDateString('zh-CN'))
-  }, [])
+  const [isMounted] = useState(true)
+  const [currentDate] = useState(() => new Date().toLocaleDateString('zh-CN'))
 
   return (
     <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40">

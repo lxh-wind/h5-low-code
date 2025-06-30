@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, createRef } from 'react'
+import React, { useState } from 'react'
 import { createPortal } from 'react-dom'
 import * as Dialog from '@radix-ui/react-dialog'
 import { usePageStore } from '@/store/pages'
@@ -354,7 +354,7 @@ export function PageCard({ page }: PageCardProps) {
               </div>
 
               <p className="text-gray-600 mb-6">
-                确定要删除页面 <strong>"{page.name}"</strong> 吗？此操作无法撤销。
+                确定要删除页面 <strong>&quot;{page.name}&quot;</strong> 吗？此操作无法撤销。
               </p>
 
               <div className="flex justify-end gap-3">

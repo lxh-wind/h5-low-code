@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { X, FileText, Smartphone, Monitor, Tablet, Eye, Search } from 'lucide-react'
+import React, { useState } from 'react'
+import { FileText, Smartphone, Monitor, Tablet, Eye, Search } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -22,7 +22,7 @@ interface Template {
   category: string
   thumbnail: string
   deviceType: 'mobile' | 'tablet' | 'desktop'
-  components: any[]
+  components: unknown[]
 }
 
 interface TemplateLibraryDialogProps {

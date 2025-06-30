@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useEditorStore } from '@/store/editor'
 import { Component } from '@/types/schema'
 import { getComponentConfig } from '@/materials/configs'
@@ -9,13 +9,12 @@ import { ChevronDownIcon, ChevronRightIcon, GripVerticalIcon, XIcon } from 'luci
 import {
   DndContext,
   DragEndEvent,
-  DragOverEvent,
-  DragOverlay,
   DragStartEvent,
   PointerSensor,
   useSensor,
   useSensors,
   closestCenter,
+  DragOverlay
 } from '@dnd-kit/core'
 import {
   SortableContext,
@@ -210,10 +209,7 @@ function DragOverlayComponent({ component }: { component: Component | null }) {
 export function TreeView() {
   const { 
     components, 
-    selectedComponentId, 
-    selectComponent, 
-    deleteComponent,
-    moveComponent 
+    moveComponent
   } = useEditorStore()
 
   const [activeComponent, setActiveComponent] = useState<Component | null>(null)
@@ -262,7 +258,7 @@ export function TreeView() {
     moveComponent(dragId, hoverId, position)
   }
 
-  const handleDragOver = (event: DragOverEvent) => {
+  const handleDragOver = () => {
     // 可以在这里添加更复杂的拖拽逻辑，比如显示插入指示器
     // 暂时保持简单，具体的位置判断在 handleDragEnd 中处理
   }
@@ -274,6 +270,8 @@ export function TreeView() {
       component.children.flatMap(child => getAllChildren(child))
     )
   }
+
+
 
   if (components.length === 0) {
     return (

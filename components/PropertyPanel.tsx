@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { useEditorStore } from '@/store/editor'
 import { getComponentConfig } from '@/materials/configs'
 import * as Tabs from '@radix-ui/react-tabs'
@@ -26,7 +26,7 @@ export function PropertyPanel() {
 
   const config = getComponentConfig(selectedComponent.type)
 
-  const handlePropsChange = (key: string, value: any) => {
+  const handlePropsChange = (key: string, value: string | boolean) => {
     updateComponent(selectedComponentId!, {
       props: {
         ...selectedComponent.props,
@@ -35,7 +35,7 @@ export function PropertyPanel() {
     })
   }
 
-  const handleStyleChange = (key: string, value: any) => {
+  const handleStyleChange = (key: string, value: string) => {
     updateComponent(selectedComponentId!, {
       style: {
         ...selectedComponent.style,

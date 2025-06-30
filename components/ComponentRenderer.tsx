@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import { Component } from '@/types/schema'
 import { useEditorStore } from '@/store/editor'
 import { SelectionBox } from '@/components/SelectionBox'
@@ -59,7 +60,7 @@ export function ComponentRenderer({
       if (style) {
         Object.entries(style).forEach(([key, value]) => {
           if (value) {
-            (convertedStyle as any)[key] = processStyleValue(key, value)
+            (convertedStyle as Record<string, unknown>)[key] = processStyleValue(key, value)
           }
         })
       }
@@ -105,7 +106,7 @@ export function ComponentRenderer({
 
         case 'image':
           return (
-            <img
+            <Image
               style={{
                 ...baseStyle,
                 display: 'block',
@@ -115,6 +116,8 @@ export function ComponentRenderer({
               }}
               src={props.src || 'https://via.placeholder.com/200x150?text=图片'}
               alt={props.alt || '图片'}
+              width={200}
+              height={150}
               onClick={handleClick}
             />
           )
@@ -153,7 +156,7 @@ export function ComponentRenderer({
                 backgroundColor: convertedStyle?.backgroundColor || '#f5f5f5',
                 borderRadius: convertedStyle?.borderRadius || '4px',
                 display: convertedStyle?.display || 'flex',
-                flexDirection: (convertedStyle?.flexDirection as any) || 'column',
+                flexDirection: (convertedStyle?.flexDirection as 'row' | 'column') || 'column',
                 gap: convertedStyle?.gap,
               }}
               onClick={handleClick}
@@ -189,7 +192,7 @@ export function ComponentRenderer({
               style={{
                 ...baseStyle,
                 display: convertedStyle?.display || 'flex',
-                flexDirection: (convertedStyle?.flexDirection as any) || 'column',
+                flexDirection: (convertedStyle?.flexDirection as 'row' | 'column') || 'column',
                 gap: convertedStyle?.gap,
               }}
               onClick={handleClick}
@@ -231,7 +234,7 @@ export function ComponentRenderer({
                 paddingRight: convertedStyle?.paddingRight || convertedStyle?.padding || '16px',
                 paddingBottom: convertedStyle?.paddingBottom || convertedStyle?.padding || '16px',
                 paddingLeft: convertedStyle?.paddingLeft || convertedStyle?.padding || '16px',
-                boxShadow: (convertedStyle as any)?.boxShadow || '0 2px 8px rgba(0,0,0,0.1)',
+                boxShadow: convertedStyle?.boxShadow || '0 2px 8px rgba(0,0,0,0.1)',
               }}
               onClick={handleClick}
             >

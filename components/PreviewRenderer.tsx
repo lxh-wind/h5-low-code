@@ -2,64 +2,50 @@
 
 import React from 'react'
 import { Component } from '@/types/schema'
+import Image from 'next/image'
 
 interface PreviewRendererProps {
   component: Component
 }
 
 export function PreviewRenderer({ component }: PreviewRendererProps) {
-  const { type, props, className, style, children } = component
+  const { className } = component
   
   // 开发环境下的调试信息（仅在需要时启用）
   if (process.env.NODE_ENV === 'development' && process.env.DEBUG_RENDERER) {
     console.log('PreviewRenderer Debug:', {
-      componentType: type,
+      componentType: component.type,
       componentId: component.id,
       precompiledClassName: className,
-      originalStyle: style,
+      originalStyle: component.style,
       hasClassName: !!className,
-      hasStyle: !!style && Object.keys(style).length > 0,
+      hasStyle: !!component.style && Object.keys(component.style).length > 0,
     })
   }
   
-  const renderComponent = () => {
-    // 基础类名
-    const baseClasses = 'transition-all duration-200'
-    
-    // 组合类名 - 优先使用预编译的 className
-    const combinedClassName = [baseClasses, className].filter(Boolean).join(' ')
-    
-    // 内联样式 - 总是应用，作为className的补充或fallback
-    const inlineStyle: React.CSSProperties = style ? {
-      // 只有在没有className的情况下才使用全部样式作为fallback
-      ...(className ? {} : {
-        marginTop: style?.marginTop,
-        marginRight: style?.marginRight,
-        marginBottom: style?.marginBottom,
-        marginLeft: style?.marginLeft,
-        paddingTop: style?.paddingTop,
-        paddingRight: style?.paddingRight,
-        paddingBottom: style?.paddingBottom,
-        paddingLeft: style?.paddingLeft,
-        width: style?.width,
-        height: style?.height,
-        backgroundColor: style?.backgroundColor,
-        color: style?.color,
-        fontSize: style?.fontSize,
-        fontWeight: style?.fontWeight,
-        borderWidth: style?.borderWidth,
-        borderStyle: style?.borderStyle,
-        borderColor: style?.borderColor,
-        borderRadius: style?.borderRadius,
-        display: style?.display as any,
-        textAlign: style?.textAlign as any,
+  const renderComponent = (component: Component): React.ReactNode => {
+    const { type, style } = component
+
+    // 处理样式转换
+    const processedStyle: React.CSSProperties = {}
+    if (style) {
+      Object.entries(style).forEach(([key, value]) => {
+        if (value) {
+          (processedStyle as Record<string, string>)[key] = value
+        }
       })
-    } : {}
+    }
+
+    // 组合样式：内联样式 + 预编译的类名
+    const inlineStyle: React.CSSProperties = {
+      ...processedStyle,
+      boxSizing: 'border-box'
+    }
 
     // 开发环境下输出最终使用的样式（仅在调试时启用）
     if (process.env.NODE_ENV === 'development' && process.env.DEBUG_RENDERER) {
       console.log('Final styles for', component.id, {
-        className: combinedClassName,
+        className: className,
         inlineStyle,
         usingFallback: !className && style && Object.keys(style).length > 0
       })
@@ -68,48 +54,50 @@ export function PreviewRenderer({ component }: PreviewRendererProps) {
     switch (type) {
       case 'text':
         return (
-          <span className={combinedClassName} style={inlineStyle}>
-            {props.text || '文本内容'}
+          <span className={className} style={inlineStyle}>
+            {component.props.text || '文本内容'}
           </span>
         )
 
       case 'button':
         return (
           <button
-            className={`${combinedClassName} ${!className ? 'px-4 py-2 rounded hover:opacity-80 disabled:opacity-50' : ''}`}
+            className={`${className} ${!className ? 'px-4 py-2 rounded hover:opacity-80 disabled:opacity-50' : ''}`}
             style={inlineStyle}
-            disabled={props.disabled}
+            disabled={component.props.disabled}
           >
-            {props.text || '按钮'}
+            {component.props.text || '按钮'}
           </button>
         )
 
       case 'image':
         return (
-          <img
-            className={`${combinedClassName} ${!className ? 'block object-cover' : ''}`}
+          <Image
+            key={component.id}
             style={inlineStyle}
-            src={props.src || 'https://via.placeholder.com/200x150?text=图片'}
-            alt={props.alt || '图片'}
+            src={component.props.src || 'https://via.placeholder.com/200x150?text=图片'}
+            alt={component.props.alt || '图片'}
+            width={200}
+            height={150}
           />
         )
 
       case 'input':
         return (
           <input
-            className={`${combinedClassName} ${!className ? 'px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500' : ''}`}
+            className={`${className} ${!className ? 'px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500' : ''}`}
             style={inlineStyle}
-            type={props.type || 'text'}
-            placeholder={props.placeholder || '请输入内容'}
+            type={component.props.type || 'text'}
+            placeholder={component.props.placeholder || '请输入内容'}
             readOnly // 预览模式下只读
           />
         )
 
       case 'container':
         return (
-          <div className={`${combinedClassName} ${!className ? 'min-h-[50px]' : ''}`} style={inlineStyle}>
-            {children && children.length > 0 ? (
-              children.map((child: Component) => (
+          <div className={`${className} ${!className ? 'min-h-[50px]' : ''}`} style={inlineStyle}>
+            {component.children && component.children.length > 0 ? (
+              component.children.map((child: Component) => (
                 <PreviewRenderer key={child.id} component={child} />
               ))
             ) : (
@@ -122,9 +110,9 @@ export function PreviewRenderer({ component }: PreviewRendererProps) {
 
       case 'list':
         return (
-          <div className={combinedClassName} style={inlineStyle}>
-            {children && children.length > 0 ? (
-              children.map((child: Component) => (
+          <div className={className} style={inlineStyle}>
+            {component.children && component.children.length > 0 ? (
+              component.children.map((child: Component) => (
                 <PreviewRenderer key={child.id} component={child} />
               ))
             ) : (
@@ -137,9 +125,9 @@ export function PreviewRenderer({ component }: PreviewRendererProps) {
 
       case 'card':
         return (
-          <div className={`${combinedClassName} ${!className ? 'bg-white rounded-lg shadow border' : ''}`} style={inlineStyle}>
-            {children && children.length > 0 ? (
-              children.map((child: Component) => (
+          <div className={`${className} ${!className ? 'bg-white rounded-lg shadow border' : ''}`} style={inlineStyle}>
+            {component.children && component.children.length > 0 ? (
+              component.children.map((child: Component) => (
                 <PreviewRenderer key={child.id} component={child} />
               ))
             ) : (
@@ -152,22 +140,22 @@ export function PreviewRenderer({ component }: PreviewRendererProps) {
 
       case 'divider':
         return (
-          <div className={`${combinedClassName} ${!className ? 'border-t border-gray-300' : ''}`} style={inlineStyle} />
+          <div className={`${className} ${!className ? 'border-t border-gray-300' : ''}`} style={inlineStyle} />
         )
 
       case 'space':
         return (
-          <div className={combinedClassName} style={inlineStyle} />
+          <div className={className} style={inlineStyle} />
         )
 
       default:
         return (
-          <div className={combinedClassName} style={inlineStyle}>
+          <div className={className} style={inlineStyle}>
             未知组件类型: {type}
           </div>
         )
     }
   }
 
-  return renderComponent()
+  return renderComponent(component)
 } 

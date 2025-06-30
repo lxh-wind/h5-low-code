@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Page } from '@/types/schema'
 import { PageCard } from '@/components/PageCard'
 import { PageListItem } from './PageListItem'
 import { FavoritePages } from './FavoritePages'
@@ -33,8 +33,8 @@ import {
 } from 'lucide-react'
 
 interface PageManagementProps {
-  pages: any[]
-  favoritePages: any[]
+  pages: Page[]
+  favoritePages: Page[]
   isLoading: boolean
   searchQuery: string
   setSearchQuery: (query: string) => void
@@ -179,7 +179,7 @@ export function PageManagement({
 
               {/* 排序选择 */}
               <div className="min-w-[140px]">
-                <Select value={sortBy} onValueChange={(value) => setSortBy(value as any)}>
+                <Select value={sortBy} onValueChange={(value) => setSortBy(value as 'updated' | 'created' | 'name')}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>

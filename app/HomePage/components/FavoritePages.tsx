@@ -1,11 +1,12 @@
 'use client'
 
+import { Page } from '@/types/schema'
 import { useFavoriteStore } from '@/store/favorites'
 import { Button, Card, CardContent } from '@/components/ui'
 import { Heart, Star } from 'lucide-react'
 
 interface FavoritePagesProps {
-  favoritePages: any[]
+  favoritePages: Page[]
   onOpenPage: (pageId: string) => void
   isLoading: boolean
 }

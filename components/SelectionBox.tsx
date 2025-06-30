@@ -20,7 +20,7 @@ interface ToolbarState {
 }
 
 export function SelectionBox({ children, componentId, isSelected, componentName }: SelectionBoxProps) {
-  const { deleteComponent, selectComponent } = useEditorStore()
+  const { deleteComponent } = useEditorStore()
   const containerRef = useRef<HTMLDivElement>(null)
   const [toolbarState, setToolbarState] = useState<ToolbarState>({ 
     top: 0, 
@@ -29,12 +29,10 @@ export function SelectionBox({ children, componentId, isSelected, componentName 
     isScrolling: false
   })
   const scrollTimeoutRef = useRef<NodeJS.Timeout>()
-  const [isMounted, setIsMounted] = useState(false)
+  const [isMounted] = useState(true)
 
   // 确保客户端已挂载
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  // Client-side mounting is handled by initial state
 
   // 计算工具栏位置
   const calculateToolbarPosition = useCallback(() => {

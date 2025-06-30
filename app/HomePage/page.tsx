@@ -27,11 +27,10 @@ export function HomePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [showTemplateDialog, setShowTemplateDialog] = useState(false)
   const [showImportDialog, setShowImportDialog] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
+  const [isMounted] = useState(true)
 
   // 模拟初始化加载
   useEffect(() => {
-    setIsMounted(true)
     const timer = setTimeout(() => {
       setIsLoading(false)
     }, 800) // 800ms 后显示实际内容
@@ -43,9 +42,9 @@ export function HomePage() {
   const stats = useMemo(() => {
     const totalPages = pages.length
     const totalComponents = pages.reduce((sum, page) => {
-      const countComponents = (components: any[]): number => {
+      const countComponents = (components: Array<{ children?: Array<unknown> }>): number => {
         return components.reduce((count, comp) => {
-          return count + 1 + (comp.children ? countComponents(comp.children) : 0)
+          return count + 1 + (comp.children ? countComponents(comp.children as Array<{ children?: Array<unknown> }>) : 0)
         }, 0)
       }
       return sum + countComponents(page.components || [])
@@ -72,11 +71,11 @@ export function HomePage() {
     // 组件类型统计
     const componentTypes: Record<string, number> = {}
     pages.forEach(page => {
-      const countByType = (components: any[]) => {
+      const countByType = (components: Array<{ type: string; children?: Array<unknown> }>) => {
         components.forEach(comp => {
           componentTypes[comp.type] = (componentTypes[comp.type] || 0) + 1
           if (comp.children) {
-            countByType(comp.children)
+            countByType(comp.children as Array<{ type: string; children?: Array<unknown> }>)
           }
         })
       }
@@ -134,14 +133,14 @@ export function HomePage() {
   }
 
   // 处理选择模板
-  const handleSelectTemplate = (template: any) => {
+  const handleSelectTemplate = (template: { id: string; name: string; title: string; description: string; category: string; thumbnail: string; deviceType: string; components: unknown[] }) => {
     // 基于模板创建新页面
     console.log('选择模板:', template)
     // 这里应该调用页面创建逻辑，传入模板数据
   }
 
   // 处理导入模板成功
-  const handleImportSuccess = (template: any) => {
+  const handleImportSuccess = (template: { id: string; name: string; data: unknown }) => {
     // 导入模板成功后的处理
     console.log('导入模板成功:', template)
     // 可以添加到本地模板库或直接创建页面

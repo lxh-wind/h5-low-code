@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react'
+import React, { useState, useRef } from 'react'
+import { Upload, CheckCircle, AlertCircle } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import {
 interface ImportTemplateDialogProps {
   isOpen: boolean
   onClose: () => void
-  onImportSuccess: (template: any) => void
+  onImportSuccess: (template: { id: string; name: string; data: unknown }) => void
 }
 
 export function ImportTemplateDialog({ isOpen, onClose, onImportSuccess }: ImportTemplateDialogProps) {

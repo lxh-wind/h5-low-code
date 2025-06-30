@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEditorStore } from '@/store/editor'
 import { usePageStore } from '@/store/pages'
-import { Component } from '@/types/schema'
+import { Component, Page } from '@/types/schema'
 import { PreviewRenderer } from '@/components/PreviewRenderer'
 import { DeviceSelector } from '@/components/DeviceSelector'
 import { PhoneFrame } from '@/components/PhoneFrame'
@@ -16,7 +16,7 @@ export default function PreviewPage() {
   const pageId = searchParams.get('pageId')
   
   const [isLoading, setIsLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState<any>(null)
+  const [currentPage, setCurrentPage] = useState<Page | null>(null)
   
   const { 
     components,

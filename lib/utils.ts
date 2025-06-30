@@ -22,17 +22,15 @@ export function styleToCSS(style: Style): string {
 }
 
 // 将CSS字符串转换为样式对象
-export function cssToStyle(css: string): Style {
-  const style: Style = {}
-  
-  if (!css) return style
+export function cssToStyle(css: string): Record<string, string> {
+  const style: Record<string, string> = {}
   
   css.split(';').forEach(rule => {
     const [property, value] = rule.split(':').map(s => s.trim())
     if (property && value) {
       // 将CSS属性名转换为驼峰命名
       const camelProperty: string = property.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
-      ;(style as any)[camelProperty] = value
+      style[camelProperty] = value
     }
   })
   
@@ -72,7 +70,7 @@ export function deepClone<T>(obj: T): T {
 }
 
 // 防抖函数
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -87,7 +85,7 @@ export function debounce<T extends (...args: any[]) => any>(
 }
 
 // 节流函数
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -107,7 +105,7 @@ export function isValidUrl(string: string): boolean {
   try {
     new URL(string)
     return true
-  } catch (_) {
+  } catch {
     return false
   }
 }
