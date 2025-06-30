@@ -1,35 +1,34 @@
 'use client'
 
-import { useState } from 'react'
-import { Page } from '@/types/schema'
+import { useState, createRef } from 'react'
+import { createPortal } from 'react-dom'
+import * as Dialog from '@radix-ui/react-dialog'
 import { usePageStore } from '@/store/pages'
 import { useFavoriteStore } from '@/store/favorites'
-import { useRouter } from 'next/navigation'
-import * as Dialog from '@radix-ui/react-dialog'
-import * as AlertDialog from '@radix-ui/react-alert-dialog'
-import { createPortal } from 'react-dom'
+import { useTimeFormat } from '@/hooks/useTimeFormat'
+import { Page } from '@/types/schema'
 import { 
-  Edit3, 
-  Trash2, 
-  Copy, 
+  FileText, 
+  MoreVertical, 
+  Heart, 
   Eye, 
+  Edit3, 
+  Copy, 
+  Trash2, 
   Calendar,
-  FileText,
-  MoreVertical,
   ExternalLink,
-  X,
-  AlertTriangle,
-  Heart
+  X
 } from 'lucide-react'
+import { Button, Input, Textarea } from '@/components/ui'
 
 interface PageCardProps {
   page: Page
 }
 
 export function PageCard({ page }: PageCardProps) {
-  const router = useRouter()
-  const { deletePage, duplicatePage, updatePage } = usePageStore()
+  const { updatePage, deletePage, duplicatePage } = usePageStore()
   const { toggleFavorite, isFavorite } = useFavoriteStore()
+  const { formatDateTime } = useTimeFormat()
   const [showActions, setShowActions] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -43,12 +42,9 @@ export function PageCard({ page }: PageCardProps) {
   const isPageFavorite = isFavorite(page.id)
 
   const handleEdit = () => {
-    updatePage(page.id, {
-      name: editForm.name,
-      title: editForm.title,
-      description: editForm.description
-    })
+    updatePage(page.id, editForm)
     setShowEditDialog(false)
+    setShowActions(false)
   }
 
   const handleOpenEditDialog = () => {
@@ -91,20 +87,10 @@ export function PageCard({ page }: PageCardProps) {
 
   const handlePreview = () => {
     window.open(`/preview?pageId=${page.id}`, '_blank')
-    setShowActions(false)
   }
 
   const handleToggleFavorite = () => {
     toggleFavorite(page.id)
-  }
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('zh-CN', {
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(new Date(date))
   }
 
   // 计算菜单位置
@@ -188,7 +174,7 @@ export function PageCard({ page }: PageCardProps) {
           <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
             <div className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />
-              <span className="truncate">{formatDate(page.updatedAt)}</span>
+              <span className="truncate">{formatDateTime(page.updatedAt)}</span>
             </div>
           </div>
           
@@ -295,26 +281,22 @@ export function PageCard({ page }: PageCardProps) {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    页面名称 *
+                    页面名称
                   </label>
-                  <input
-                    type="text"
+                  <Input
                     value={editForm.name}
-                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    onChange={(e) => setEditForm({...editForm, name: e.target.value})}
                     placeholder="请输入页面名称"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    页面标题 *
+                    页面标题
                   </label>
-                  <input
-                    type="text"
+                  <Input
                     value={editForm.title}
-                    onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    onChange={(e) => setEditForm({...editForm, title: e.target.value})}
                     placeholder="请输入页面标题"
                   />
                 </div>
@@ -323,30 +305,28 @@ export function PageCard({ page }: PageCardProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     页面描述
                   </label>
-                  <textarea
+                  <Textarea
                     value={editForm.description}
-                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                    onChange={(e) => setEditForm({...editForm, description: e.target.value})}
+                    placeholder="请输入页面描述"
                     rows={3}
-                    placeholder="请输入页面描述（可选）"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-6">
-                <button
+              <div className="flex justify-end gap-3 mt-6">
+                <Button
+                  variant="outline"
                   onClick={handleCancelEdit}
-                  className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
                   取消
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleEdit}
                   disabled={!editForm.name.trim() || !editForm.title.trim()}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   保存
-                </button>
+                </Button>
               </div>
             </div>
           </Dialog.Content>
@@ -354,46 +334,47 @@ export function PageCard({ page }: PageCardProps) {
       </Dialog.Root>
 
       {/* 删除确认弹窗 */}
-      <AlertDialog.Root open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay className="fixed inset-0 bg-black/50 z-50 animate-in fade-in duration-200" />
-          <AlertDialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl z-50 w-full max-w-md mx-4 animate-in fade-in zoom-in-95 duration-200">
+      <Dialog.Root open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
+          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl z-50 w-full max-w-md mx-4">
             <div className="p-6">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 text-red-600" />
-                </div>
-                <div className="flex-1">
-                  <AlertDialog.Title className="text-lg font-semibold text-gray-900 mb-2">
-                    确认删除页面
-                  </AlertDialog.Title>
-                  <AlertDialog.Description className="text-sm text-gray-600 leading-relaxed">
-                    您确定要删除页面 <span className="font-medium text-gray-900">"{page.name}"</span> 吗？
-                    <br />
-                    此操作将永久删除该页面及其所有组件配置，且无法撤销。
-                  </AlertDialog.Description>
-                </div>
+              <div className="flex items-center justify-between mb-4">
+                <Dialog.Title className="text-lg font-semibold text-gray-900">
+                  确认删除
+                </Dialog.Title>
+                <Dialog.Close asChild>
+                  <button
+                    className="p-1 hover:bg-gray-100 rounded"
+                    aria-label="关闭"
+                  >
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </Dialog.Close>
               </div>
 
-              <div className="flex gap-3 justify-end">
-                <AlertDialog.Cancel asChild>
-                  <button className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-medium">
-                    取消
-                  </button>
-                </AlertDialog.Cancel>
-                <AlertDialog.Action asChild>
-                  <button 
-                    onClick={handleConfirmDelete}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                  >
-                    确认删除
-                  </button>
-                </AlertDialog.Action>
+              <p className="text-gray-600 mb-6">
+                确定要删除页面 <strong>"{page.name}"</strong> 吗？此操作无法撤销。
+              </p>
+
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteDialog(false)}
+                >
+                  取消
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleConfirmDelete}
+                >
+                  删除
+                </Button>
               </div>
             </div>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   )
 } 
