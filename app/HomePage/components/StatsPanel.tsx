@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui'
 import { 
   SkeletonStatsCard 
-} from '@/components/Skeleton'
+} from '@/components/common'
 import {
   FileText,
   Palette,

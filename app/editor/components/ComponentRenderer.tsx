@@ -4,7 +4,7 @@ import React from 'react'
 import Image from 'next/image'
 import { Component } from '@/types/schema'
 import { useEditorStore } from '@/store/editor'
-import { SelectionBox } from '@/components/SelectionBox'
+import { SelectionBox } from './SelectionBox'
 
 interface ComponentRendererProps {
   component: Component

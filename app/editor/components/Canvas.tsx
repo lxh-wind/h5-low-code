@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useEditorStore } from '@/store/editor'
-import { ComponentRenderer } from '@/components/ComponentRenderer'
+import { ComponentRenderer } from './ComponentRenderer'
 
 export function Canvas() {
   const { components, selectedComponentId, selectComponent } = useEditorStore()

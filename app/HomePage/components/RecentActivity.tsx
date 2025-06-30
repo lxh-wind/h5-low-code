@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui'
-import { SkeletonActivity, Skeleton } from '@/components/Skeleton'
+import { SkeletonActivity, Skeleton } from '@/components/common'
 import { useTimeFormat } from '@/hooks/useTimeFormat'
 import { Clock, Activity, Edit3 } from 'lucide-react'
 

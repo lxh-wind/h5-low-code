@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui'
-import { Skeleton } from '@/components/Skeleton'
+import { Skeleton } from '@/components/common'
 import { 
   Smartphone,
   BookOpen,

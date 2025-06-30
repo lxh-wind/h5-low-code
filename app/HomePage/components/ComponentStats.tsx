@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui'
-import { SkeletonComponentStats, Skeleton } from '@/components/Skeleton'
+import { SkeletonComponentStats, Skeleton } from '@/components/common'
 import { BarChart3 } from 'lucide-react'
 
 interface ComponentStatsProps {

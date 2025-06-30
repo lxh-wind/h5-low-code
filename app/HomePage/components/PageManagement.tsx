@@ -1,13 +1,13 @@
 'use client'
 
 import { Page } from '@/types/schema'
-import { PageCard } from '@/components/PageCard'
+import { PageCard } from './PageCard'
 import { PageListItem } from './PageListItem'
 import { FavoritePages } from './FavoritePages'
 import {
   SkeletonPageCard,
   Skeleton
-} from '@/components/Skeleton'
+} from '@/components/common'
 import {
   Button,
   Input,

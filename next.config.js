@@ -46,6 +46,20 @@ const nextConfig = {
   images: {
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'img4.yishouapp.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
 }
 

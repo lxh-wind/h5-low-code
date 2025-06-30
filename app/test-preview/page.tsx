@@ -1,6 +1,6 @@
 'use client'
 
-import { PreviewRenderer } from '@/components/PreviewRenderer'
+import { PreviewRenderer } from '@/components/layout'
 import { Component } from '@/types/schema'
 import { styleToTailwind } from '@/lib/utils'
 

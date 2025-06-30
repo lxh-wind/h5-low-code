@@ -2,7 +2,7 @@
 
 import { useEditorStore } from '@/store/editor'
 import { generateReactCode } from '@/lib/codegen'
-import { DeviceSelector } from '@/components/DeviceSelector'
+import { DeviceSelector } from '@/components/common'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import * as Toast from '@radix-ui/react-toast'
 import { UndoIcon, RedoIcon, EyeIcon, SaveIcon, DownloadIcon, CheckCircleIcon, XCircleIcon, LoaderIcon } from 'lucide-react'

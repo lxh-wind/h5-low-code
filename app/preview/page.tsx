@@ -5,9 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEditorStore } from '@/store/editor'
 import { usePageStore } from '@/store/pages'
 import { Component, Page } from '@/types/schema'
-import { PreviewRenderer } from '@/components/PreviewRenderer'
-import { DeviceSelector } from '@/components/DeviceSelector'
-import { PhoneFrame } from '@/components/PhoneFrame'
+import { PreviewRenderer } from '@/components/layout'
+import { DeviceSelector, PhoneFrame } from '@/components/common'
 import { ArrowLeftIcon } from 'lucide-react'
 
 export default function PreviewPage() {

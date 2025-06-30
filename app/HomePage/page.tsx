@@ -3,9 +3,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { usePageStore } from '@/store/pages'
 import { useFavoriteStore } from '@/store/favorites'
-import { CreatePageDialog } from '@/components/CreatePageDialog'
-import { TemplateLibraryDialog } from '@/components/TemplateLibraryDialog'
-import { ImportTemplateDialog } from '@/components/ImportTemplateDialog'
+import { CreatePageDialog, TemplateLibraryDialog, ImportTemplateDialog } from './components'
 import { useCurrentTime } from '@/hooks/useCurrentTime'
 import {
   HomeHeader,
