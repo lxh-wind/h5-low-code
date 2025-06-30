@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Toast 动画 */
+@keyframes slideIn {
+  from {
+    transform: translateX(calc(100% + 24px));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes hide {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes swipeOut {
+  from {
+    transform: translateX(var(--radix-toast-swipe-end-x));
+  }
+  to {
+    transform: translateX(calc(100% + 24px));
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-hide {
+  animation: hide 100ms ease-in;
+}
+
+.animate-swipeOut {
+  animation: swipeOut 100ms ease-out;
+}
+
+/* iPhone 预览框样式 */
+.iphone-frame {
+  background: #000;
+  border-radius: 40px;
+  padding: 8px;
+  box-shadow: 
+    0 0 0 2px #1f1f1f,
+    0 0 20px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  /* 确保框架本身不会被内容撑开 */
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.iphone-screen {
+  background: #fff;
+  border-radius: 32px;
+  overflow: hidden;
+  position: relative;
+  /* 确保屏幕区域严格按照设定尺寸显示 */
+  box-sizing: border-box;
+}
+
+.iphone-notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 28px;
+  background: #000;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  z-index: 10;
+}
+
+/* 组件物料库样式 */
+.material-item {
+  @apply border border-gray-200 rounded-lg p-3 cursor-pointer transition-all hover:border-blue-400 hover:shadow-md;
+}
+
+.material-item:hover {
+  transform: translateY(-2px);
+}
+
+/* 属性面板样式 */
+.property-panel {
+  @apply border-l border-gray-200 bg-gray-50;
+}
+
+@layer components {
+  .property-section {
+    @apply p-4 border-b border-gray-200 last:border-b-0;
+  }
+}
+
+@layer utilities {
+  /* 动态样式支持 - 使用 CSS 变量 */
+  .dynamic-styles {
+    margin-top: var(--margin-top, 0);
+    margin-right: var(--margin-right, 0);
+    margin-bottom: var(--margin-bottom, 0);
+    margin-left: var(--margin-left, 0);
+    padding-top: var(--padding-top, 0);
+    padding-right: var(--padding-right, 0);
+    padding-bottom: var(--padding-bottom, 0);
+    padding-left: var(--padding-left, 0);
+    width: var(--width, auto);
+    height: var(--height, auto);
+    color: var(--color, inherit);
+    background-color: var(--background-color, transparent);
+    font-size: var(--font-size, inherit);
+    font-weight: var(--font-weight, normal);
+    border-width: var(--border-width, 0);
+    border-style: var(--border-style, solid);
+    border-color: var(--border-color, transparent);
+    border-radius: var(--border-radius, 0);
+  }
+} 
