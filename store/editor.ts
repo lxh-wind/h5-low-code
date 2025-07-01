@@ -601,10 +601,6 @@ export const useEditorStore = create<EditorState>()(
     precompileStyles: () => {
       const { components } = get()
       
-      if (process.env.NODE_ENV === 'development') {
-        console.log('开始样式预编译，原始组件数量:', components.length)
-      }
-      
       const precompileComponentStyles = (comps: Component[]): Component[] => {
         return comps.map(comp => {
           // 将样式转换为 TailwindCSS 类名
@@ -630,10 +626,6 @@ export const useEditorStore = create<EditorState>()(
         components: updatedComponents,
         treeManager
       })
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('样式预编译完成')
-      }
     },
   }))
 ) 

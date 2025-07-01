@@ -11,18 +11,6 @@ interface PreviewRendererProps {
 export function PreviewRenderer({ component }: PreviewRendererProps) {
   const { className } = component
   
-  // 开发环境下的调试信息（仅在需要时启用）
-  if (process.env.NODE_ENV === 'development' && process.env.DEBUG_RENDERER) {
-    console.log('PreviewRenderer Debug:', {
-      componentType: component.type,
-      componentId: component.id,
-      precompiledClassName: className,
-      originalStyle: component.style,
-      hasClassName: !!className,
-      hasStyle: !!component.style && Object.keys(component.style).length > 0,
-    })
-  }
-  
   const renderComponent = (component: Component): React.ReactNode => {
     const { type, style } = component
 
@@ -40,15 +28,6 @@ export function PreviewRenderer({ component }: PreviewRendererProps) {
     const inlineStyle: React.CSSProperties = {
       ...processedStyle,
       boxSizing: 'border-box'
-    }
-
-    // 开发环境下输出最终使用的样式（仅在调试时启用）
-    if (process.env.NODE_ENV === 'development' && process.env.DEBUG_RENDERER) {
-      console.log('Final styles for', component.id, {
-        className: className,
-        inlineStyle,
-        usingFallback: !className && style && Object.keys(style).length > 0
-      })
     }
 
     switch (type) {

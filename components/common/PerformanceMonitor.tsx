@@ -12,7 +12,7 @@ export function PerformanceMonitor({ componentName, enabled = false }: Performan
   const lastRenderTimeRef = useRef(Date.now())
   
   useEffect(() => {
-    if (!enabled || process.env.NODE_ENV !== 'development') return
+    if (!enabled) return
     
     renderCountRef.current += 1
     const now = Date.now()
