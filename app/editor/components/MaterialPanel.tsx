@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { getAllComponentConfigs } from '@/materials/configs'
 import { ComponentConfig } from '@/types/schema'
 import { useEditorStore } from '@/store/editor'
@@ -13,6 +13,11 @@ interface MaterialItemProps {
 
 function DraggableMaterialItem({ config }: MaterialItemProps) {
   const { addComponent } = useEditorStore()
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
 
   const {
     attributes,
@@ -26,6 +31,7 @@ function DraggableMaterialItem({ config }: MaterialItemProps) {
       type: 'material',
       config: config,
     },
+    disabled: !isHydrated,
   })
 
   const style = {
@@ -50,8 +56,8 @@ function DraggableMaterialItem({ config }: MaterialItemProps) {
         <button
           ref={setNodeRef}
           style={style}
-          {...attributes}
-          {...listeners}
+          {...(isHydrated ? attributes : {})}
+          {...(isHydrated ? listeners : {})}
           onClick={handleClick}
           className="material-item w-full text-left cursor-grab active:cursor-grabbing"
           aria-label={`添加${config.name}组件`}
@@ -79,8 +85,6 @@ function DraggableMaterialItem({ config }: MaterialItemProps) {
     </Tooltip.Root>
   )
 }
-
-
 
 export function MaterialPanel() {
   const configs = getAllComponentConfigs()

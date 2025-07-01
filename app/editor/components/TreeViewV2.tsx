@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import { useEditorStore } from '@/store/editor'
 import { TreeNode } from '@/lib/tree-manager'
+import { ComponentType } from '@/types/schema'
 import { getComponentConfig } from '@/materials/configs'
 import { 
   XIcon, 
@@ -46,7 +47,7 @@ interface TreeNodeItemProps {
 }
 
 function TreeNodeItem({ node, onSelect, onDelete, onToggleExpanded, onMove, isSelected }: TreeNodeItemProps) {
-  const config = getComponentConfig(node.type as any)
+  const config = getComponentConfig(node.type as ComponentType)
   const IconComponent = componentIcons[node.type as keyof typeof componentIcons] || FileTextIcon
   const hasChildren = node.children.length > 0
 

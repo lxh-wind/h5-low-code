@@ -6,7 +6,7 @@ import { ComponentRenderer } from './ComponentRenderer'
 import { useDroppable } from '@dnd-kit/core'
 
 export function Canvas() {
-  const { getRootComponents, selectedComponentId, selectComponent, addComponent } = useEditorStore()
+  const { getRootComponents, selectedComponentId, selectComponent } = useEditorStore()
   
   // 获取根级组件（只渲染没有父组件的组件）
   const rootComponents = getRootComponents()

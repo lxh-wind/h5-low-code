@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react'
 import { useEditorStore } from '@/store/editor'
-import { Component } from '@/types/schema'
+import { Component, ComponentType } from '@/types/schema'
 import { getComponentConfig } from '@/materials/configs'
 import {
   UncontrolledTreeEnvironment,
@@ -62,7 +62,6 @@ function convertToTreeData(components: Component[]): Record<TreeItemIndex, TreeI
 
   function processComponent(component: Component) {
     const config = getComponentConfig(component.type)
-    const hasChildren = component.children && component.children.length > 0
     
     items[component.id] = {
       index: component.id,
@@ -90,7 +89,6 @@ function convertToTreeData(components: Component[]): Record<TreeItemIndex, TreeI
 export function TreeView() {
   const { 
     components, 
-    moveComponent,
     selectedComponentId,
     selectComponent,
     deleteComponent
@@ -165,7 +163,7 @@ export function TreeView() {
     }
 
     const IconComponent = componentIcons[item.data.type as keyof typeof componentIcons] || FileTextIcon
-    const config = getComponentConfig(item.data.type as any)
+    const config = getComponentConfig(item.data.type as ComponentType)
 
     const handleDelete = (e: React.MouseEvent) => {
       e.stopPropagation()
