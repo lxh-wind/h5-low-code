@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: write  # ✅ 必须添加，否则 gh-pages 无法 push
+  contents: write
 
 jobs:
   build-and-deploy:
@@ -30,7 +30,7 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: /h5-low-code
           NODE_ENV: production
 
-      - name: Create .nojekyll file
+      - name: Create .nojekyll
         run: echo > out/.nojekyll
 
       - name: Deploy to GitHub Pages
