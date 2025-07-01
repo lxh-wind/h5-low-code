@@ -13,7 +13,7 @@ import {
   ComponentStats
 } from './components'
 
-export function HomePage() {
+export default function HomePage() {
   const { pages } = usePageStore()
   const { favoriteIds } = useFavoriteStore()
   const currentTime = useCurrentTime()
