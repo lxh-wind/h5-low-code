@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
+  basePath: '/h5-low-code-editor',
+  trailingSlash: true,
   experimental: {
     appDir: true,
     turbo: {
