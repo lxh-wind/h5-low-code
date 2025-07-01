@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { FileText, Smartphone, Monitor, Tablet, Eye, Search } from 'lucide-react'
 import {
   Dialog,

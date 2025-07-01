@@ -112,7 +112,7 @@ export function HomePage() {
 
   const handleCreateSuccess = (pageId: string) => {
     // 在新标签页中打开编辑器
-    window.open(`/editor?pageId=${pageId}`, '_blank')
+    globalThis.open(`/editor?pageId=${pageId}`, '_blank')
   }
 
   // 处理模板库
@@ -127,7 +127,7 @@ export function HomePage() {
 
   // 处理收藏页面点击
   const handleOpenFavoritePage = (pageId: string) => {
-    window.open(`/editor?pageId=${pageId}`, '_blank')
+    globalThis.open(`/editor?pageId=${pageId}`, '_blank')
   }
 
   // 处理选择模板

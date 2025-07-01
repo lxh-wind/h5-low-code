@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import * as Dialog from '@radix-ui/react-dialog'
 import { usePageStore } from '@/store/pages'
@@ -82,11 +82,11 @@ export function PageCard({ page }: PageCardProps) {
   }
 
   const handleOpenEditor = () => {
-    window.open(`/editor?pageId=${page.id}`, '_blank')
+    globalThis.open(`/editor?pageId=${page.id}`, '_blank')
   }
 
   const handlePreview = () => {
-    window.open(`/preview?pageId=${page.id}`, '_blank')
+    globalThis.open(`/preview?pageId=${page.id}`, '_blank')
   }
 
   const handleToggleFavorite = () => {
@@ -99,7 +99,7 @@ export function PageCard({ page }: PageCardProps) {
     const rect = buttonRef.getBoundingClientRect()
     return {
       top: rect.bottom + 8,
-      right: window.innerWidth - rect.right
+      right: globalThis.innerWidth - rect.right
     }
   }
 

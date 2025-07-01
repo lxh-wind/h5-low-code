@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useEditorStore } from '@/store/editor'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -49,9 +49,9 @@ export function SelectionBox({ children, componentId, isSelected, componentName 
     let top = rect.top - toolbarHeight - margin
     let left = rect.left
     
-    // 边界检查
-    const viewportHeight = window.innerHeight
-    const viewportWidth = window.innerWidth
+    // 获取视口尺寸
+    const viewportHeight = globalThis.innerHeight
+    const viewportWidth = globalThis.innerWidth
     
     // 如果顶部空间不足，放到组件下方
     if (top < 10) {
@@ -125,13 +125,13 @@ export function SelectionBox({ children, componentId, isSelected, componentName 
       container?.addEventListener('scroll', handleScroll, { passive: true })
     })
 
-    window.addEventListener('resize', calculateToolbarPosition, { passive: true })
+    globalThis.addEventListener('resize', calculateToolbarPosition, { passive: true })
 
     return () => {
       scrollContainers.forEach(container => {
         container?.removeEventListener('scroll', handleScroll)
       })
-      window.removeEventListener('resize', calculateToolbarPosition)
+      globalThis.removeEventListener('resize', calculateToolbarPosition)
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current)
       }

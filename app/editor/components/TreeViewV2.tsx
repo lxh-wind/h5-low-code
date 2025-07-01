@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useEditorStore } from '@/store/editor'
 import { TreeNode } from '@/lib/tree-manager'
 import { ComponentType } from '@/types/schema'

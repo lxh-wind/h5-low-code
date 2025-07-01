@@ -12,6 +12,10 @@ interface FavoriteState {
   getFavoriteIds: () => string[]
 }
 
+interface PersistedState {
+  favoriteIds: string[]
+}
+
 export const useFavoriteStore = create<FavoriteState>()(
   persist(
     (set, get) => ({
@@ -51,19 +55,19 @@ export const useFavoriteStore = create<FavoriteState>()(
     {
       name: 'favorite-pages-storage',
       // 兼容旧的localStorage数据
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: PersistedState | unknown, version: number) => {
         if (version === 0) {
           // 从旧的localStorage格式迁移数据
-          if (typeof window !== 'undefined') {
+          if (typeof globalThis !== 'undefined' && 'localStorage' in globalThis) {
             try {
-              const oldFavorites = JSON.parse(localStorage.getItem('favoritePages') || '[]')
+              const oldFavorites = JSON.parse(globalThis.localStorage.getItem('favoritePages') || '[]')
               return { favoriteIds: oldFavorites }
             } catch {
               return { favoriteIds: [] }
             }
           }
         }
-        return persistedState
+        return persistedState as PersistedState
       },
       version: 1
     }

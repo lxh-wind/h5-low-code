@@ -19,7 +19,7 @@ export function CreatePageDialog({ isOpen, onClose, onSuccess }: CreatePageDialo
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name.trim() || !form.title.trim()) return
 

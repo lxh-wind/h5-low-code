@@ -90,12 +90,13 @@ function generateComponentCode(component: Component, indent: number = 0): string
       return `${indentStr}<img${classNameAttr} src="${props.src || ''}" alt="${props.alt || '图片'}" />`
     case 'input':
       return `${indentStr}<input${classNameAttr} type="${props.type || 'text'}" placeholder="${props.placeholder || ''}" />`
-    default:
+    default: {
       let childrenCode = ''
       if (children && children.length > 0) {
         childrenCode = '\n' + children.map(child => generateComponentCode(child, indent + 1)).join('\n') + '\n' + indentStr
       }
       return `${indentStr}<div${classNameAttr}>${childrenCode}</div>`
+    }
   }
 }
 

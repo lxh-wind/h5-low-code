@@ -128,14 +128,15 @@ export class TreeManager {
 
     // 插入到新位置
     switch (position) {
-      case 'inside':
+      case 'inside': {
         dragNode.parent = hoverNode
         dragNode.depth = hoverNode.depth + 1
         hoverNode.children.push(dragNode)
         break
+      }
       
       case 'before':
-      case 'after':
+      case 'after': {
         const targetParent = hoverNode.parent
         const targetArray = targetParent ? targetParent.children : this.rootNodes
         const hoverIndex = targetArray.indexOf(hoverNode)
@@ -145,6 +146,7 @@ export class TreeManager {
         dragNode.depth = targetParent ? targetParent.depth + 1 : 0
         targetArray.splice(insertIndex, 0, dragNode)
         break
+      }
     }
 
     this.updateVisibility()

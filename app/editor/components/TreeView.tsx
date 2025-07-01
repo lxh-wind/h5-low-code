@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useEditorStore } from '@/store/editor'
 import { Component, ComponentType } from '@/types/schema'
 import { getComponentConfig } from '@/materials/configs'

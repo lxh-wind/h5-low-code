@@ -30,11 +30,11 @@ export function PageListItem({ page }: PageListItemProps) {
   const isPageFavorite = isFavorite(page.id)
 
   const handleEdit = () => {
-    window.open(`/editor?pageId=${page.id}`, '_blank')
+    globalThis.open(`/editor?pageId=${page.id}`, '_blank')
   }
 
   const handlePreview = () => {
-    window.open(`/preview?pageId=${page.id}`, '_blank')
+    globalThis.open(`/preview?pageId=${page.id}`, '_blank')
   }
 
   const handleDuplicate = () => {
