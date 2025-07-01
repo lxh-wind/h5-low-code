@@ -16,12 +16,13 @@ export function useNavigation() {
   }, [])
 
   /**
-   * 在新窗口中打开页面，自动加上 basePath
+   * 在新窗口中打开页面，自动加上 basePath 和 origin
    */
   const openInNewTab = useCallback((path: string) => {
     if (typeof globalThis !== 'undefined' && globalThis.open) {
+      const origin = typeof window !== 'undefined' ? window.location.origin : ''
       const basePath = getBasePath()
-      const fullPath = `${basePath}${path}`
+      const fullPath = `${origin}${basePath}${path}`
       globalThis.open(fullPath, '_blank')
     }
   }, [getBasePath])
@@ -49,6 +50,32 @@ export function useNavigation() {
   }, [getBasePath])
 
   /**
+   * 获取绝对路径（完整 URL，包含域名）
+   */
+  const getAbsoluteUrl = useCallback((path: string) => {
+    if (typeof window === 'undefined') {
+      // 服务端渲染时返回相对路径
+      return getFullUrl(path)
+    }
+    
+    const basePath = getBasePath()
+    const fullPath = `${basePath}${path}`
+    
+    // 使用当前页面的 origin 拼接完整 URL
+    return `${window.location.origin}${fullPath}`
+  }, [getBasePath, getFullUrl])
+
+  /**
+   * 获取当前页面的完整 URL
+   */
+  const getCurrentAbsoluteUrl = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return ''
+    }
+    return window.location.href
+  }, [])
+
+  /**
    * 返回上一页
    */
   const goBack = useCallback(() => {
@@ -67,6 +94,8 @@ export function useNavigation() {
     navigateTo,
     replaceTo,
     getFullUrl,
+    getAbsoluteUrl,
+    getCurrentAbsoluteUrl,
     goBack,
     goForward,
     basePath: getBasePath()
@@ -77,7 +106,7 @@ export function useNavigation() {
  * 页面跳转相关的 hooks
  */
 export function usePageNavigation() {
-  const { openInNewTab, navigateTo } = useNavigation()
+  const { openInNewTab, navigateTo, getAbsoluteUrl } = useNavigation()
 
   /**
    * 打开编辑器页面
@@ -109,10 +138,36 @@ export function usePageNavigation() {
     navigateTo('/HomePage')
   }, [navigateTo])
 
+  /**
+   * 获取编辑器页面的绝对路径
+   */
+  const getEditorAbsoluteUrl = useCallback((pageId?: string) => {
+    const path = pageId ? `/editor?pageId=${pageId}` : '/editor'
+    return getAbsoluteUrl(path)
+  }, [getAbsoluteUrl])
+
+  /**
+   * 获取预览页面的绝对路径
+   */
+  const getPreviewAbsoluteUrl = useCallback((pageId?: string) => {
+    const path = pageId ? `/preview?pageId=${pageId}` : '/preview'
+    return getAbsoluteUrl(path)
+  }, [getAbsoluteUrl])
+
+  /**
+   * 获取首页的绝对路径
+   */
+  const getHomeAbsoluteUrl = useCallback(() => {
+    return getAbsoluteUrl('/')
+  }, [getAbsoluteUrl])
+
   return {
     openEditor,
     openPreview,
     goToHome,
-    goToHomePage
+    goToHomePage,
+    getEditorAbsoluteUrl,
+    getPreviewAbsoluteUrl,
+    getHomeAbsoluteUrl
   }
 }
