@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { Component } from '@/types/schema'
 import { useEditorStore } from '@/store/editor'
 import { SelectionBox } from './SelectionBox'
+import { useDroppable } from '@dnd-kit/core'
+import { getComponentConfig } from '@/materials/configs'
 
 interface ComponentRendererProps {
   component: Component
@@ -21,6 +23,20 @@ export function ComponentRenderer({
 }: ComponentRendererProps) {
   const { type, props, style, children } = component
   const { selectedComponentId, selectComponent } = useEditorStore()
+  
+  // 为容器组件设置拖拽放置区域
+  const config = getComponentConfig(type)
+  const {
+    isOver,
+    setNodeRef: setDropRef,
+  } = useDroppable({
+    id: `component-${component.id}`,
+    disabled: !config.canHaveChildren || mode !== 'editor',
+    data: {
+      type: 'container',
+      componentId: component.id,
+    },
+  })
   
   // 处理样式值，自动添加单位
   const processStyleValue = (key: string, value: string): string => {
@@ -146,6 +162,7 @@ export function ComponentRenderer({
         case 'container':
           return (
             <div
+              ref={setDropRef}
               style={{
                 ...baseStyle,
                 minHeight: '50px',
@@ -158,6 +175,11 @@ export function ComponentRenderer({
                 display: convertedStyle?.display || 'flex',
                 flexDirection: (convertedStyle?.flexDirection as 'row' | 'column') || 'column',
                 gap: convertedStyle?.gap,
+                // 拖拽悬停时的视觉反馈
+                ...(isOver && {
+                  backgroundColor: '#e3f2fd',
+                  border: '2px dashed #2196f3',
+                }),
               }}
               onClick={handleClick}
             >
@@ -173,14 +195,15 @@ export function ComponentRenderer({
                 ))
               ) : (
                 <div style={{
-                  color: '#9ca3af',
+                  color: isOver ? '#2196f3' : '#9ca3af',
                   fontSize: '14px',
                   padding: '16px',
                   textAlign: 'center',
-                  border: '2px dashed #d1d5db',
-                  borderRadius: '4px'
+                  border: isOver ? '2px dashed #2196f3' : '2px dashed #d1d5db',
+                  borderRadius: '4px',
+                  backgroundColor: isOver ? '#e3f2fd' : 'transparent',
                 }}>
-                  拖拽组件到这里
+                  {isOver ? '松开鼠标放置组件' : '拖拽组件到这里'}
                 </div>
               )}
             </div>
@@ -189,11 +212,19 @@ export function ComponentRenderer({
         case 'list':
           return (
             <div
+              ref={setDropRef}
               style={{
                 ...baseStyle,
                 display: convertedStyle?.display || 'flex',
                 flexDirection: (convertedStyle?.flexDirection as 'row' | 'column') || 'column',
                 gap: convertedStyle?.gap,
+                // 拖拽悬停时的视觉反馈
+                ...(isOver && {
+                  backgroundColor: '#e3f2fd',
+                  border: '2px dashed #2196f3',
+                  borderRadius: '4px',
+                  padding: '8px',
+                }),
               }}
               onClick={handleClick}
             >
@@ -209,14 +240,15 @@ export function ComponentRenderer({
                 ))
               ) : (
                 <div style={{
-                  color: '#9ca3af',
+                  color: isOver ? '#2196f3' : '#9ca3af',
                   fontSize: '14px',
                   padding: '16px',
                   textAlign: 'center',
-                  border: '2px dashed #d1d5db',
-                  borderRadius: '4px'
+                  border: isOver ? '2px dashed #2196f3' : '2px dashed #d1d5db',
+                  borderRadius: '4px',
+                  backgroundColor: isOver ? '#e3f2fd' : 'transparent',
                 }}>
-                  拖拽组件到这里
+                  {isOver ? '松开鼠标放置组件' : '拖拽组件到这里'}
                 </div>
               )}
             </div>
@@ -225,6 +257,7 @@ export function ComponentRenderer({
         case 'card':
           return (
             <div
+              ref={setDropRef}
               style={{
                 ...baseStyle,
                 backgroundColor: convertedStyle?.backgroundColor || '#ffffff',
@@ -235,6 +268,11 @@ export function ComponentRenderer({
                 paddingBottom: convertedStyle?.paddingBottom || convertedStyle?.padding || '16px',
                 paddingLeft: convertedStyle?.paddingLeft || convertedStyle?.padding || '16px',
                 boxShadow: convertedStyle?.boxShadow || '0 2px 8px rgba(0,0,0,0.1)',
+                // 拖拽悬停时的视觉反馈
+                ...(isOver && {
+                  backgroundColor: '#e3f2fd',
+                  border: '2px dashed #2196f3',
+                }),
               }}
               onClick={handleClick}
             >
@@ -250,14 +288,15 @@ export function ComponentRenderer({
                 ))
               ) : (
                 <div style={{
-                  color: '#9ca3af',
+                  color: isOver ? '#2196f3' : '#9ca3af',
                   fontSize: '14px',
                   padding: '16px',
                   textAlign: 'center',
-                  border: '2px dashed #d1d5db',
-                  borderRadius: '4px'
+                  border: isOver ? '2px dashed #2196f3' : '2px dashed #d1d5db',
+                  borderRadius: '4px',
+                  backgroundColor: isOver ? '#e3f2fd' : 'transparent',
                 }}>
-                  拖拽组件到这里
+                  {isOver ? '松开鼠标放置组件' : '拖拽组件到这里'}
                 </div>
               )}
             </div>

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { Component, Page, Project } from '@/types/schema'
 import { styleToTailwind } from '@/lib/utils'
+import { TreeManager, TreeNode } from '@/lib/tree-manager'
 
 // 手机机型配置
 export interface DeviceConfig {
@@ -67,8 +68,9 @@ interface EditorState {
   currentProject: Project | null
   currentPage: Page | null
   
-  // 组件相关
-  components: Component[]
+  // 组件相关 - 使用TreeManager统一管理
+  treeManager: TreeManager | null
+  components: Component[] // 保持兼容性，但作为只读数据
   selectedComponentId: string | null
   hoveredComponentId: string | null
   
@@ -91,6 +93,12 @@ interface EditorState {
   selectComponent: (id: string | null) => void
   setHoveredComponent: (id: string | null) => void
   moveComponent: (dragId: string, hoverId: string, position: 'before' | 'after' | 'inside') => void
+  
+  // 树管理器相关方法
+  getTreeNodes: () => TreeNode[]
+  getVisibleTreeNodes: () => TreeNode[]
+  getRootComponents: () => Component[]
+  toggleNodeExpanded: (id: string) => void
   
   // 历史记录
   undo: () => void
@@ -119,6 +127,7 @@ export const useEditorStore = create<EditorState>()(
     // 初始状态
     currentProject: null,
     currentPage: null,
+    treeManager: null,
     components: [],
     selectedComponentId: null,
     hoveredComponentId: null,
@@ -131,15 +140,23 @@ export const useEditorStore = create<EditorState>()(
     // Actions
     setCurrentProject: (project) => set({ currentProject: project }),
     
-    setCurrentPage: (page) => set({ 
-      currentPage: page,
-      components: page.components,
-      selectedComponentId: null,
-      hoveredComponentId: null,
-    }),
+    setCurrentPage: (page) => {
+      const treeManager = new TreeManager(page.components)
+      set({ 
+        currentPage: page,
+        components: page.components,
+        treeManager,
+        selectedComponentId: null,
+        hoveredComponentId: null,
+      })
+    },
     
     setComponents: (components) => {
-      set({ components })
+      const treeManager = new TreeManager(components)
+      set({ 
+        components,
+        treeManager
+      })
       get().saveToHistory()
     },
     
@@ -154,22 +171,28 @@ export const useEditorStore = create<EditorState>()(
       let newComponents = [...components]
       
       if (parentId) {
-        // 添加到指定父组件
-        const parentIndex = newComponents.findIndex(c => c.id === parentId)
-        if (parentIndex !== -1) {
-          const parent = newComponents[parentIndex]
-          const children = parent.children || []
-          const insertIndex = index !== undefined ? index : children.length
-          
-          newComponents[parentIndex] = {
-            ...parent,
-            children: [
-              ...children.slice(0, insertIndex),
-              newComponent,
-              ...children.slice(insertIndex)
-            ]
-          }
+        // 添加到指定父组件的 children 中（递归查找父组件）
+        const addToParent = (comps: Component[]): Component[] => {
+          return comps.map(comp => {
+            if (comp.id === parentId) {
+              const children = comp.children || []
+              const insertIndex = index !== undefined ? index : children.length
+              return {
+                ...comp,
+                children: [
+                  ...children.slice(0, insertIndex),
+                  newComponent,
+                  ...children.slice(insertIndex)
+                ]
+              }
+            }
+            if (comp.children) {
+              return { ...comp, children: addToParent(comp.children) }
+            }
+            return comp
+          })
         }
+        newComponents = addToParent(newComponents)
       } else {
         // 添加到根级别
         const insertIndex = index !== undefined ? index : newComponents.length
@@ -180,51 +203,96 @@ export const useEditorStore = create<EditorState>()(
         ]
       }
       
+      // 创建新的 TreeManager，保持展开状态
+      const { treeManager: currentTreeManager } = get()
+      const newTreeManager = new TreeManager(newComponents, currentTreeManager?.getExpandedState())
+      
       set({ 
         components: newComponents,
+        treeManager: newTreeManager,
         selectedComponentId: newComponent.id 
       })
       get().saveToHistory()
     },
     
     updateComponent: (id, updates) => {
-      const { components } = get()
+      const { treeManager } = get()
       
-      const updateComponentRecursive = (comps: Component[]): Component[] => {
-        return comps.map(comp => {
-          if (comp.id === id) {
-            return { ...comp, ...updates }
-          }
-          if (comp.children) {
-            return { ...comp, children: updateComponentRecursive(comp.children) }
-          }
-          return comp
+      if (treeManager) {
+        // 使用 TreeManager 更新组件
+        const newComponents = treeManager.updateComponent(id, updates)
+        const newTreeManager = new TreeManager(newComponents, treeManager.getExpandedState())
+        
+        set({ 
+          components: newComponents,
+          treeManager: newTreeManager
         })
+        get().saveToHistory()
+      } else {
+        // 兜底：使用原来的递归更新逻辑
+        const { components } = get()
+        
+        const updateComponentRecursive = (comps: Component[]): Component[] => {
+          return comps.map(comp => {
+            if (comp.id === id) {
+              return { ...comp, ...updates }
+            }
+            if (comp.children) {
+              return { ...comp, children: updateComponentRecursive(comp.children) }
+            }
+            return comp
+          })
+        }
+        
+        const newComponents = updateComponentRecursive(components)
+        const { treeManager: currentTreeManager } = get()
+        const newTreeManager = new TreeManager(newComponents, currentTreeManager?.getExpandedState())
+        
+        set({ 
+          components: newComponents,
+          treeManager: newTreeManager
+        })
+        get().saveToHistory()
       }
-      
-      const newComponents = updateComponentRecursive(components)
-      set({ components: newComponents })
-      get().saveToHistory()
     },
     
     deleteComponent: (id) => {
-      const { components } = get()
+      const { treeManager } = get()
       
-      const deleteComponentRecursive = (comps: Component[]): Component[] => {
-        return comps
-          .filter(comp => comp.id !== id)
-          .map(comp => ({
-            ...comp,
-            children: comp.children ? deleteComponentRecursive(comp.children) : undefined
-          }))
+      if (treeManager) {
+        // 使用 TreeManager 删除组件
+        const newComponents = treeManager.deleteNode(id)
+        const newTreeManager = new TreeManager(newComponents, treeManager.getExpandedState())
+        
+        set({ 
+          components: newComponents,
+          treeManager: newTreeManager,
+          selectedComponentId: null 
+        })
+        get().saveToHistory()
+      } else {
+        // 兜底：使用原来的递归删除逻辑
+        const { components } = get()
+        
+        const deleteComponentRecursive = (comps: Component[]): Component[] => {
+          return comps
+            .filter(comp => comp.id !== id)
+            .map(comp => ({
+              ...comp,
+              children: comp.children ? deleteComponentRecursive(comp.children) : undefined
+            }))
+        }
+        
+        const newComponents = deleteComponentRecursive(components)
+        const newTreeManager = new TreeManager(newComponents)
+        
+        set({ 
+          components: newComponents,
+          treeManager: newTreeManager,
+          selectedComponentId: null 
+        })
+        get().saveToHistory()
       }
-      
-      const newComponents = deleteComponentRecursive(components)
-      set({ 
-        components: newComponents,
-        selectedComponentId: null 
-      })
-      get().saveToHistory()
     },
     
     selectComponent: (id) => set({ selectedComponentId: id }),
@@ -232,101 +300,130 @@ export const useEditorStore = create<EditorState>()(
     setHoveredComponent: (id) => set({ hoveredComponentId: id }),
     
     moveComponent: (dragId, hoverId, position) => {
-      const { components } = get()
+      const { treeManager } = get()
       
-      // 递归查找并移除拖拽的组件
-      const findAndRemoveComponent = (comps: Component[], targetId: string): { component: Component | null, newComps: Component[] } => {
-        for (let i = 0; i < comps.length; i++) {
-          if (comps[i].id === targetId) {
-            const component = comps[i]
-            const newComps = [...comps.slice(0, i), ...comps.slice(i + 1)]
-            return { component, newComps }
-          }
-          
-          if (comps[i].children) {
-            const result = findAndRemoveComponent(comps[i].children || [], targetId)
-            if (result.component) {
-              const newComps = [...comps]
-              newComps[i] = { ...newComps[i], children: result.newComps }
-              return { component: result.component, newComps }
-            }
-          }
-        }
-        return { component: null, newComps: comps }
-      }
-      
-      // 递归插入组件
-      const insertComponent = (comps: Component[], targetId: string, component: Component, position: 'before' | 'after' | 'inside'): Component[] => {
-        for (let i = 0; i < comps.length; i++) {
-          if (comps[i].id === targetId) {
-            if (position === 'inside') {
-              // 插入为子组件
-              const children = comps[i].children || []
-              return [
-                ...comps.slice(0, i),
-                { ...comps[i], children: [...children, { ...component, parentId: targetId }] },
-                ...comps.slice(i + 1)
-              ]
-            } else if (position === 'before') {
-              // 插入到目标组件前面
-              return [
-                ...comps.slice(0, i),
-                { ...component, parentId: comps[i].parentId },
-                ...comps.slice(i)
-              ]
-            } else {
-              // 插入到目标组件后面
-              return [
-                ...comps.slice(0, i + 1),
-                { ...component, parentId: comps[i].parentId },
-                ...comps.slice(i + 1)
-              ]
-            }
-          }
-          
-          if (comps[i].children) {
-            const newChildren = insertComponent(comps[i].children || [], targetId, component, position)
-            if (newChildren !== comps[i].children) {
-              return [
-                ...comps.slice(0, i),
-                { ...comps[i], children: newChildren },
-                ...comps.slice(i + 1)
-              ]
-            }
-          }
-        }
-        return comps
-      }
-      
-      // 检查是否试图将组件移动到自己的子组件中
-      const isDescendant = (parentId: string, childId: string, comps: Component[]): boolean => {
-                 const findChildren = (id: string): string[] => {
-           const component = comps.find((c: Component) => c.id === id) || 
-             comps.flatMap((c: Component) => c.children || []).find((c: Component) => c.id === id)
-           return component?.children?.map((c: Component) => c.id) || []
-         }
+      if (treeManager) {
+        // 使用 TreeManager 移动组件
+        const newComponents = treeManager.moveNode(dragId, hoverId, position)
+        const newTreeManager = new TreeManager(newComponents, treeManager.getExpandedState())
         
-        const checkDescendant = (currentId: string): boolean => {
-          if (currentId === childId) return true
-          const children = findChildren(currentId)
-          return children.some(checkDescendant)
-        }
-        
-        return checkDescendant(parentId)
-      }
-      
-      // 避免将组件移动到自己或自己的子组件中
-      if (dragId === hoverId || isDescendant(dragId, hoverId, components)) {
-        return
-      }
-      
-      // 执行移动操作
-      const { component: draggedComponent, newComps: componentsWithoutDragged } = findAndRemoveComponent(components, dragId)
-      
-      if (draggedComponent) {
-        const finalComponents = insertComponent(componentsWithoutDragged, hoverId, draggedComponent, position)
-        set({ components: finalComponents })
+        set({ 
+          components: newComponents,
+          treeManager: newTreeManager
+        })
         get().saveToHistory()
+      } else {
+        // 兜底：使用原来的递归移动逻辑
+        const { components } = get()
+        
+        // 递归查找并移除拖拽的组件
+        const findAndRemoveComponent = (comps: Component[], targetId: string): { component: Component | null, newComps: Component[] } => {
+          for (let i = 0; i < comps.length; i++) {
+            if (comps[i].id === targetId) {
+              const component = comps[i]
+              const newComps = [...comps.slice(0, i), ...comps.slice(i + 1)]
+              return { component, newComps }
+            }
+            
+            if (comps[i].children) {
+              const result = findAndRemoveComponent(comps[i].children || [], targetId)
+              if (result.component) {
+                const newComps = [...comps]
+                newComps[i] = { ...newComps[i], children: result.newComps }
+                return { component: result.component, newComps }
+              }
+            }
+          }
+          return { component: null, newComps: comps }
+        }
+        
+        // 递归插入组件
+        const insertComponent = (comps: Component[], targetId: string, component: Component, position: 'before' | 'after' | 'inside'): Component[] => {
+          for (let i = 0; i < comps.length; i++) {
+            if (comps[i].id === targetId) {
+              if (position === 'inside') {
+                // 插入为子组件
+                const children = comps[i].children || []
+                return [
+                  ...comps.slice(0, i),
+                  { ...comps[i], children: [...children, { ...component, parentId: targetId }] },
+                  ...comps.slice(i + 1)
+                ]
+              } else if (position === 'before') {
+                // 插入到目标组件前面
+                return [
+                  ...comps.slice(0, i),
+                  { ...component, parentId: comps[i].parentId },
+                  ...comps.slice(i)
+                ]
+              } else {
+                // 插入到目标组件后面
+                return [
+                  ...comps.slice(0, i + 1),
+                  { ...component, parentId: comps[i].parentId },
+                  ...comps.slice(i + 1)
+                ]
+              }
+            }
+            
+            if (comps[i].children) {
+              const newChildren = insertComponent(comps[i].children || [], targetId, component, position)
+              if (newChildren !== comps[i].children) {
+                return [
+                  ...comps.slice(0, i),
+                  { ...comps[i], children: newChildren },
+                  ...comps.slice(i + 1)
+                ]
+              }
+            }
+          }
+          return comps
+        }
+        
+        // 检查是否试图将组件移动到自己的子组件中
+        const isDescendant = (parentId: string, childId: string, comps: Component[]): boolean => {
+          const findComponent = (id: string, components: Component[]): Component | null => {
+            for (const comp of components) {
+              if (comp.id === id) return comp
+              if (comp.children) {
+                const found = findComponent(id, comp.children)
+                if (found) return found
+              }
+            }
+            return null
+          }
+          
+          const checkDescendant = (currentId: string): boolean => {
+            if (currentId === childId) return true
+            const component = findComponent(currentId, comps)
+            if (component?.children) {
+              return component.children.some(child => checkDescendant(child.id))
+            }
+            return false
+          }
+          
+          return checkDescendant(parentId)
+        }
+        
+        // 避免将组件移动到自己或自己的子组件中
+        if (dragId === hoverId || isDescendant(dragId, hoverId, components)) {
+          return
+        }
+        
+        // 执行移动操作
+        const { component: draggedComponent, newComps: componentsWithoutDragged } = findAndRemoveComponent(components, dragId)
+        
+        if (draggedComponent) {
+          const finalComponents = insertComponent(componentsWithoutDragged, hoverId, draggedComponent, position)
+          const { treeManager: currentTreeManager } = get()
+          const newTreeManager = new TreeManager(finalComponents, currentTreeManager?.getExpandedState())
+          
+          set({ 
+            components: finalComponents,
+            treeManager: newTreeManager
+          })
+          get().saveToHistory()
+        }
       }
     },
     
@@ -335,8 +432,12 @@ export const useEditorStore = create<EditorState>()(
       const { history, historyIndex } = get()
       if (historyIndex > 0) {
         const newIndex = historyIndex - 1
+        const components = history[newIndex]
+        const newTreeManager = new TreeManager(components)
+        
         set({ 
-          components: history[newIndex],
+          components,
+          treeManager: newTreeManager,
           historyIndex: newIndex,
           selectedComponentId: null 
         })
@@ -347,8 +448,12 @@ export const useEditorStore = create<EditorState>()(
       const { history, historyIndex } = get()
       if (historyIndex < history.length - 1) {
         const newIndex = historyIndex + 1
+        const components = history[newIndex]
+        const newTreeManager = new TreeManager(components)
+        
         set({ 
-          components: history[newIndex],
+          components,
+          treeManager: newTreeManager,
           historyIndex: newIndex,
           selectedComponentId: null 
         })
@@ -437,6 +542,61 @@ export const useEditorStore = create<EditorState>()(
       return `comp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     },
     
+    // 树管理器相关方法
+    getTreeNodes: () => {
+      const { treeManager } = get()
+      return treeManager ? treeManager.getRootNodes() : []
+    },
+
+    getVisibleTreeNodes: () => {
+      const { treeManager } = get()
+      return treeManager ? treeManager.getVisibleNodes() : []
+    },
+
+    getRootComponents: () => {
+      const { treeManager } = get()
+      if (treeManager) {
+        // 从 TreeManager 获取根节点，递归构建带有 children 的组件结构
+        const convertTreeNodeToComponent = (node: TreeNode): Component => {
+          return {
+            ...node.component,
+            children: node.children.map(convertTreeNodeToComponent)
+          }
+        }
+        
+        return treeManager.getRootNodes().map(convertTreeNodeToComponent)
+      } else {
+        // 兜底：从 components 数组中构建层级结构
+        const { components } = get()
+        const rootComponents = components.filter(comp => !comp.parentId)
+        
+        // 递归构建子组件结构
+        const buildChildren = (parentId: string): Component[] => {
+          return components
+            .filter(comp => comp.parentId === parentId)
+            .map(comp => ({
+              ...comp,
+              children: buildChildren(comp.id)
+            }))
+        }
+        
+        return rootComponents.map(comp => ({
+          ...comp,
+          children: buildChildren(comp.id)
+        }))
+      }
+    },
+
+    toggleNodeExpanded: (id) => {
+      const { treeManager } = get()
+      if (treeManager) {
+        treeManager.toggleExpanded(id)
+        // 创建新的实例来触发重新渲染，保持展开状态
+        const newTreeManager = new TreeManager(treeManager.toComponentArray(), treeManager.getExpandedState())
+        set({ treeManager: newTreeManager })
+      }
+    },
+
     // 样式预编译 - 递归处理所有组件
     precompileStyles: () => {
       const { components } = get()
@@ -465,7 +625,11 @@ export const useEditorStore = create<EditorState>()(
       }
       
       const updatedComponents = precompileComponentStyles(components)
-      set({ components: updatedComponents })
+      const treeManager = new TreeManager(updatedComponents)
+      set({ 
+        components: updatedComponents,
+        treeManager
+      })
       
       if (process.env.NODE_ENV === 'development') {
         console.log('样式预编译完成')
