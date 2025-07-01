@@ -1,9 +1,9 @@
-const repoName = process.env.NEXT_PUBLIC_BASE_PATH || ''; 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''; 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  basePath: repoName ? `/${repoName}` : '',
-  assetPrefix: repoName ? `/${repoName}/` : '',
+  basePath,
+  assetPrefix: basePath + '/',
   trailingSlash: true,
   experimental: {
     appDir: true,
