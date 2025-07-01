@@ -1,9 +1,9 @@
-const repoName = 'h5-low-code'; 
+const repoName = process.env.NEXT_PUBLIC_BASE_PATH || ''; 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  basePath: `/${repoName}`,
-  assetPrefix: `/${repoName}/`,
+  basePath: repoName ? `/${repoName}` : '',
+  assetPrefix: repoName ? `/${repoName}/` : '',
   trailingSlash: true,
   experimental: {
     appDir: true,

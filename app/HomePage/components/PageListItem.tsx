@@ -5,6 +5,7 @@ import { Page } from '@/types/schema'
 import { useFavoriteStore } from '@/store/favorites'
 import { usePageStore } from '@/store/pages'
 import { useTimeFormat } from '@/hooks/useTimeFormat'
+import { useNavigation } from '@/hooks'
 import { Button, Card, CardContent } from '@/components/ui'
 import { 
   FileText,
@@ -25,16 +26,17 @@ export function PageListItem({ page }: PageListItemProps) {
   const { toggleFavorite, isFavorite } = useFavoriteStore()
   const { deletePage, duplicatePage } = usePageStore()
   const { formatRelativeTime } = useTimeFormat()
+  const { openInNewTab } = useNavigation()
   const [showActions, setShowActions] = useState(false)
   
   const isPageFavorite = isFavorite(page.id)
 
   const handleEdit = () => {
-    globalThis.open(`/editor?pageId=${page.id}`, '_blank')
+    openInNewTab(`/editor?pageId=${page.id}`)
   }
 
   const handlePreview = () => {
-    globalThis.open(`/preview?pageId=${page.id}`, '_blank')
+    openInNewTab(`/preview?pageId=${page.id}`)
   }
 
   const handleDuplicate = () => {

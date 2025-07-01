@@ -6,6 +6,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { usePageStore } from '@/store/pages'
 import { useFavoriteStore } from '@/store/favorites'
 import { useTimeFormat } from '@/hooks/useTimeFormat'
+import { useNavigation } from '@/hooks'
 import { Page } from '@/types/schema'
 import { 
   FileText, 
@@ -29,6 +30,7 @@ export function PageCard({ page }: PageCardProps) {
   const { updatePage, deletePage, duplicatePage } = usePageStore()
   const { toggleFavorite, isFavorite } = useFavoriteStore()
   const { formatDateTime } = useTimeFormat()
+  const { openInNewTab } = useNavigation()
   const [showActions, setShowActions] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -82,11 +84,11 @@ export function PageCard({ page }: PageCardProps) {
   }
 
   const handleOpenEditor = () => {
-    globalThis.open(`/editor?pageId=${page.id}`, '_blank')
+    openInNewTab(`/editor?pageId=${page.id}`)
   }
 
   const handlePreview = () => {
-    globalThis.open(`/preview?pageId=${page.id}`, '_blank')
+    openInNewTab(`/preview?pageId=${page.id}`)
   }
 
   const handleToggleFavorite = () => {

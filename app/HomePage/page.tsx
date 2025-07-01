@@ -5,6 +5,7 @@ import { usePageStore } from '@/store/pages'
 import { useFavoriteStore } from '@/store/favorites'
 import { CreatePageDialog, TemplateLibraryDialog, ImportTemplateDialog } from './components'
 import { useCurrentTime } from '@/hooks/useCurrentTime'
+import { useNavigation } from '@/hooks'
 import {
   HomeHeader,
   StatsPanel,
@@ -17,6 +18,7 @@ export default function HomePage() {
   const { pages } = usePageStore()
   const { favoriteIds } = useFavoriteStore()
   const currentTime = useCurrentTime()
+  const { openInNewTab } = useNavigation()
   
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -112,7 +114,7 @@ export default function HomePage() {
 
   const handleCreateSuccess = (pageId: string) => {
     // 在新标签页中打开编辑器
-    globalThis.open(`/editor?pageId=${pageId}`, '_blank')
+    openInNewTab(`/editor?pageId=${pageId}`)
   }
 
   // 处理模板库
@@ -127,7 +129,7 @@ export default function HomePage() {
 
   // 处理收藏页面点击
   const handleOpenFavoritePage = (pageId: string) => {
-    globalThis.open(`/editor?pageId=${pageId}`, '_blank')
+    openInNewTab(`/editor?pageId=${pageId}`)
   }
 
   // 处理选择模板
