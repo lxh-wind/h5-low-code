@@ -3,7 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main # 或你默认的主分支
+      - main
+
+permissions:
+  contents: write  # ✅ 必须添加权限，否则 peaceiris 无法 push
 
 jobs:
   build-and-deploy:
@@ -16,13 +19,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18 # 或其他你使用的版本
+          node-version: 18
 
       - name: Install dependencies
         run: npm install
 
       - name: Build static site
         run: npm run build
+
+      - name: Create .nojekyll file
+        run: echo > out/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

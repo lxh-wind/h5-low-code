@@ -1,7 +1,9 @@
+const repoName = 'h5-low-code'; 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  basePath: '/h5-low-code-editor',
+  basePath: `/${repoName}`,
+  assetPrefix: `/${repoName}/`,
   trailingSlash: true,
   experimental: {
     appDir: true,
