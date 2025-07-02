@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useMemo, memo, useCallback } from 'react'
-import { getAllComponentConfigs } from '@/materials'
+import React, { memo, useCallback, useState, useEffect } from 'react'
+import { getAllComponentConfigs, initializeComponents } from '@/materials'
 import { ComponentConfig } from '@/types/schema'
 import { useEditorStore } from '@/store/editor'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -10,7 +10,7 @@ import { useDraggable } from '@dnd-kit/core'
 interface MaterialItemProps {
   config: ComponentConfig
   onAddComponent: (config: ComponentConfig) => void
-  index: number // 添加索引确保唯一性
+  index: number // 添加索引確保唯一性
 }
 
 // 純客戶端的可拖拽材料項目組件
@@ -78,8 +78,33 @@ const DraggableMaterialItem = memo(function DraggableMaterialItem({ config, onAd
 })
 
 export const MaterialPanel = memo(function MaterialPanel() {
-  // 使用 useMemo 確保 configs 的引用穩定
-  const configs = useMemo(() => getAllComponentConfigs(), [])
+  const [configs, setConfigs] = useState<ComponentConfig[]>([])
+
+  // 異步初始化組件系統
+  useEffect(() => {
+    let isMounted = true
+
+    const initComponents = async () => {
+      try {
+        console.log('🔧 MaterialPanel: 開始初始化組件系統...')
+        await initializeComponents()
+        
+        if (isMounted) {
+          const allConfigs = getAllComponentConfigs()
+          console.log('✅ MaterialPanel: 組件初始化完成，獲取到', allConfigs.length, '個組件')
+          setConfigs(allConfigs)
+        }
+      } catch (error) {
+        console.error('❌ MaterialPanel: 組件初始化失敗:', error)
+      }
+    }
+
+    initComponents()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   // 使用 useCallback 穩定函數引用，在事件處理中直接獲取最新狀態
   const handleAddComponent = useCallback((config: ComponentConfig) => {
@@ -94,22 +119,6 @@ export const MaterialPanel = memo(function MaterialPanel() {
     // 直接獲取最新狀態，避免訂閱導致的重新渲染
     useEditorStore.getState().addComponent(newComponent)
   }, [])
-
-  // 如果組件配置為空，顯示加載狀態
-  if (configs.length === 0) {
-    return (
-      <div className="space-y-2 animate-pulse">
-        <div className="text-xs text-gray-400 px-2 py-1 bg-gray-100 rounded">
-          🔄 正在加載組件庫...
-        </div>
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-16 bg-gray-200 rounded"></div>
-        ))}
-      </div>
-    )
-  }
-
-  console.log('MaterialPanel - configs',configs);
 
   return (
     <Tooltip.Provider>

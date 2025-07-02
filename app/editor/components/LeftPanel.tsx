@@ -10,7 +10,9 @@ const MaterialPanel = dynamic(
     ssr: false,
     loading: () => (
       <div className="space-y-2 animate-pulse">
-        <div className="h-4 bg-gray-200 rounded"></div>
+        <div className="text-xs text-gray-400 px-2 py-1 bg-gray-100 rounded">
+          🔄 正在加載組件庫...
+        </div>
         {Array.from({ length: 10 }, (_, i) => (
           <div key={i} className="h-16 bg-gray-200 rounded"></div>
         ))}
