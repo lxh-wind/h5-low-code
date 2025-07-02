@@ -79,6 +79,7 @@ const DraggableMaterialItem = memo(function DraggableMaterialItem({ config, onAd
 
 export const MaterialPanel = memo(function MaterialPanel() {
   const [configs, setConfigs] = useState<ComponentConfig[]>([])
+  const [isInitialized, setIsInitialized] = useState(false)
 
   // 異步初始化組件系統
   useEffect(() => {
@@ -93,9 +94,15 @@ export const MaterialPanel = memo(function MaterialPanel() {
           const allConfigs = getAllComponentConfigs()
           console.log('✅ MaterialPanel: 組件初始化完成，獲取到', allConfigs.length, '個組件')
           setConfigs(allConfigs)
+          setIsInitialized(true)
+
         }
       } catch (error) {
         console.error('❌ MaterialPanel: 組件初始化失敗:', error)
+        if (isMounted) {
+          setIsInitialized(true)
+        }
+
       }
     }
 
@@ -119,6 +126,33 @@ export const MaterialPanel = memo(function MaterialPanel() {
     // 直接獲取最新狀態，避免訂閱導致的重新渲染
     useEditorStore.getState().addComponent(newComponent)
   }, [])
+
+
+  // 如果組件未初始化完成，顯示加載狀態
+  if (!isInitialized) {
+    return (
+      <div className="space-y-2 animate-pulse">
+        <div className="text-xs text-gray-400 px-2 py-1 bg-gray-100 rounded">
+          🔄 正在加載組件庫...
+        </div>
+        {Array.from({ length: 10 }, (_, i) => (
+          <div key={i} className="h-16 bg-gray-200 rounded"></div>
+        ))}
+      </div>
+    )
+  }
+
+  // 如果初始化完成但沒有組件，顯示錯誤狀態
+  if (configs.length === 0) {
+    return (
+      <div className="space-y-2">
+        <div className="text-xs text-red-500 px-2 py-1 bg-red-50 rounded">
+          ⚠️ 組件庫加載失敗，請刷新頁面重試
+        </div>
+      </div>
+    )
+  }
+
 
   return (
     <Tooltip.Provider>
