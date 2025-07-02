@@ -82,6 +82,7 @@ interface EditorState {
   isDragging: boolean
   previewMode: boolean
   currentDevice: DeviceConfig
+  autoSave: boolean // 是否自动保存
   
   // Actions
   setCurrentProject: (project: Project) => void
@@ -96,6 +97,9 @@ interface EditorState {
   selectComponent: (id: string | null) => void
   setHoveredComponent: (id: string | null) => void
   moveComponent: (dragId: string, hoverId: string, position: 'before' | 'after' | 'inside') => void
+  
+  // 自動保存設置
+  setAutoSave: (autoSave: boolean) => void
   
   // 树管理器相关方法
   getTreeNodes: () => TreeNode[]
@@ -139,6 +143,7 @@ export const useEditorStore = create<EditorState>()(
     isDragging: false,
     previewMode: false,
     currentDevice: DEVICE_CONFIGS[1], // 默认使用iPhone 14
+    autoSave: false, // 關閉自動保存，改為手動保存
     
     // Actions
     setCurrentProject: (project) => set({ currentProject: project }),
@@ -510,7 +515,7 @@ export const useEditorStore = create<EditorState>()(
     canRedo: () => get().historyIndex < get().history.length - 1,
     
     saveToHistory: () => {
-      const { components, history, historyIndex } = get()
+      const { components, history, historyIndex, autoSave } = get()
       
       // 检查是否与当前历史记录相同，避免重复保存
       const currentHistory = history[historyIndex]
@@ -672,5 +677,8 @@ export const useEditorStore = create<EditorState>()(
         treeManager
       })
     },
+
+    // 自動保存設置
+    setAutoSave: (autoSave) => set({ autoSave }),
   }))
 ) 

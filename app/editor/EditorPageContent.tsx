@@ -7,7 +7,9 @@ import { Toolbar } from '@/components/layout'
 import { PhoneFrame } from '@/components/common'
 import { useEditorStore } from '@/store/editor'
 import { usePageStore } from '@/store/pages'
+
 import { initializeEditor } from '@/lib/mock'
+import { initializeComponents } from '@/materials'
 import { DndContext, DragEndEvent, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 
 export function EditorPageContent() {
@@ -17,7 +19,7 @@ export function EditorPageContent() {
   
   const { setCurrentPage, addComponent, moveComponent } = useEditorStore()
   const { getPageById } = usePageStore()
-
+  
   // 配置拖拽传感器
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -71,20 +73,39 @@ export function EditorPageContent() {
   // 初始化编辑器数据
   useEffect(() => {
     // 使用 requestAnimationFrame 延迟初始化，避免阻塞首次渲染
-    requestAnimationFrame(() => {
-      if (pageId) {
-        // 如果有 pageId，加载对应的页面
-        const page = getPageById(pageId)
-        if (page) {
-          setCurrentPage(page)
+    requestAnimationFrame(async () => {
+      try {
+        // 首先初始化組件系統
+        await initializeComponents()
+        
+        if (pageId) {
+          // 如果有 pageId，加载对应的页面
+          const page = getPageById(pageId)
+          if (page) {
+            setCurrentPage(page)
+          } else {
+            // 页面不存在，跳转到首页
+            router.push('/')
+          }
         } else {
-          // 页面不存在，跳转到首页
-          router.push('/')
+          // 没有 pageId，使用默认数据
+          const { page } = initializeEditor()
+          setCurrentPage(page)
         }
-      } else {
-        // 没有 pageId，使用默认数据
-        const { page } = initializeEditor()
-        setCurrentPage(page)
+      } catch (error) {
+        console.error('編輯器初始化失敗:', error)
+        // 即使組件系統初始化失敗，也嘗試加載頁面數據
+        if (pageId) {
+          const page = getPageById(pageId)
+          if (page) {
+            setCurrentPage(page)
+          } else {
+            router.push('/')
+          }
+        } else {
+          const { page } = initializeEditor()
+          setCurrentPage(page)
+        }
       }
     })
   }, [pageId, setCurrentPage, getPageById, router])

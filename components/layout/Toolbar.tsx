@@ -3,7 +3,7 @@
 import { useEditorStore } from '@/store/editor'
 import { DeviceSelector } from '@/components/common'
 import { JsonPreviewDialog, useToast } from '@/components/ui'
-import { useRealTimePageData, usePageNavigation } from '@/hooks'
+import { useRealTimePageData, usePageNavigation, useSaveCurrentPage } from '@/hooks'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { UndoIcon, RedoIcon, EyeIcon, SaveIcon, FileJsonIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -12,6 +12,7 @@ export function Toolbar() {
   const [showJsonPreview, setShowJsonPreview] = useState(false)
   const toast = useToast()
   const { openPreview } = usePageNavigation()
+  const saveCurrentPage = useSaveCurrentPage()
   const { 
     canUndo, 
     canRedo, 
@@ -25,9 +26,12 @@ export function Toolbar() {
   const realTimePageData = useRealTimePageData()
 
   const handleSave = () => {
-    // TODO: 实现保存功能
-    toast.success('项目已保存')
-    // 保存项目逻辑
+    const success = saveCurrentPage()
+    if (success) {
+      toast.success('頁面已保存')
+    } else {
+      toast.error('保存失敗，請重試')
+    }
   }
 
   const handleExportJson = () => {
@@ -50,10 +54,17 @@ export function Toolbar() {
     try {
       toast.loading('正在准备预览...', 1000)
       
+      // 在预览前先保存当前状态
+      const saveSuccess = saveCurrentPage()
+      if (!saveSuccess) {
+        toast.error('保存失敗，無法預覽')
+        return
+      }
+      
       // 在预览前先预编译样式
       precompileStyles()
       
-      // 模拟预编译过程
+      // 模拟保存和预编译过程
       await new Promise(resolve => setTimeout(resolve, 800))
       
       // 使用公共導航 hook 跳轉到預覽頁面，傳遞當前頁面ID
