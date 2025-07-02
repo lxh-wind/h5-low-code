@@ -3,22 +3,22 @@
 import { useEditorStore } from '@/store/editor'
 import { DeviceSelector } from '@/components/common'
 import { JsonPreviewDialog, useToast } from '@/components/ui'
-import { useRealTimePageData } from '@/hooks'
+import { useRealTimePageData, usePageNavigation } from '@/hooks'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { UndoIcon, RedoIcon, EyeIcon, SaveIcon, FileJsonIcon } from 'lucide-react'
-// import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export function Toolbar() {
-  // const router = useRouter()
   const [showJsonPreview, setShowJsonPreview] = useState(false)
   const toast = useToast()
+  const { openPreview } = usePageNavigation()
   const { 
     canUndo, 
     canRedo, 
     undo, 
     redo, 
-    precompileStyles
+    precompileStyles,
+    currentPage
   } = useEditorStore()
   
   // 使用自定义 Hook 获取实时页面数据
@@ -48,7 +48,7 @@ export function Toolbar() {
 
   const handlePreview = async () => {
     try {
-      toast.loading('正在准备预览...')
+      toast.loading('正在准备预览...', 1000)
       
       // 在预览前先预编译样式
       precompileStyles()
@@ -56,8 +56,9 @@ export function Toolbar() {
       // 模拟预编译过程
       await new Promise(resolve => setTimeout(resolve, 800))
       
-      // 使用 window.location 而不是 router.push 来避免 RSC 问题
-      window.location.href = '/preview'
+      // 使用公共導航 hook 跳轉到預覽頁面，傳遞當前頁面ID
+      openPreview(currentPage?.id)
+      
     } catch (error) {
       toast.error('预览失败')
       console.error('预览失败:', error)

@@ -69,8 +69,8 @@ export function ToastProvider({
     
     setToasts(prev => [...prev, newToast])
     
-    // 自动移除（除了 loading 类型）
-    if (type !== 'loading') {
+    // 自動移除（loading 類型如果設置了有限時間也會自動移除）
+    if (duration !== Infinity) {
       setTimeout(() => {
         setToasts(prev => prev.filter(toast => toast.id !== id))
       }, duration)
@@ -99,7 +99,7 @@ export function ToastProvider({
           return (
             <RadixToast.Root
               key={toast.id}
-              duration={toast.type === 'loading' ? Infinity : toast.duration}
+              duration={toast.duration}
               className={cn(
                 "border rounded-lg shadow-md p-3 flex items-center gap-3 data-[state=open]:animate-slideIn data-[state=closed]:animate-hide max-w-sm",
                 styles.container
@@ -141,7 +141,7 @@ export function useToast() {
   return {
     success: (message: string, duration?: number) => context.showToast(message, 'success', duration),
     error: (message: string, duration?: number) => context.showToast(message, 'error', duration),
-    loading: (message: string) => context.showToast(message, 'loading'),
+    loading: (message: string, duration?: number) => context.showToast(message, 'loading', duration ?? Infinity),
     dismiss: context.dismissToast,
     // 通用方法
     toast: context.showToast
