@@ -17,7 +17,7 @@ export function Toolbar() {
     canRedo, 
     undo, 
     redo, 
-    components,
+    currentPage,
     precompileStyles
   } = useEditorStore()
 
@@ -39,15 +39,23 @@ export function Toolbar() {
 
   const handleExport = () => {
     try {
+      if (!currentPage) {
+        showToast('没有可导出的页面', 'error')
+        return
+      }
+      
       // 生成 TailwindCSS React 代码
-      const reactCode = generateReactCode(components, 'H5Page')
+      const reactCode = generateReactCode(currentPage)
+      
+      // 使用页面名称作为文件名
+      const fileName = `${currentPage.name.replace(/[^a-zA-Z0-9]/g, '') || 'H5Page'}.tsx`
       
       // 创建下载文件
       const blob = new Blob([reactCode], { type: 'text/javascript' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = 'H5Page.tsx'
+      link.download = fileName
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)

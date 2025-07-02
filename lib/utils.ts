@@ -369,4 +369,106 @@ export function styleToTailwind(style: StyleObject = {}): string {
   })
   
   return classes.filter(Boolean).join(' ')
+}
+
+// 处理样式值，自动添加单位和验证
+export function processStyleValue(property: string, value: string | number): string {
+  if (value === undefined || value === null || value === '') {
+    return ''
+  }
+
+  const strValue = String(value)
+
+  // 需要添加px单位的属性
+  const pxProperties = [
+    'width', 'height', 'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
+    'margin', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft',
+    'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+    'fontSize', 'lineHeight', 'letterSpacing',
+    'borderWidth', 'borderRadius',
+    'top', 'right', 'bottom', 'left',
+    'gap'
+  ]
+
+  // 百分比属性（保留供未来使用）
+  // const percentageProperties = ['width', 'height', 'left', 'right', 'top', 'bottom']
+
+  // 颜色属性
+  const colorProperties = ['color', 'backgroundColor', 'borderColor']
+
+  // 如果是颜色属性，直接返回
+  if (colorProperties.includes(property)) {
+    return strValue
+  }
+
+  // 如果值已經包含單位，直接返回
+  if (/^-?\d*\.?\d+(px|em|rem|%|vh|vw|pt|pc|in|cm|mm|ex|ch|vmin|vmax)$/i.test(strValue)) {
+    return strValue
+  }
+
+  // 如果是纯数字且属性需要px单位
+  if (pxProperties.includes(property) && /^-?\d*\.?\d+$/.test(strValue)) {
+    return `${strValue}px`
+  }
+
+  // 特殊处理一些属性的默认值
+  if (property === 'lineHeight' && /^-?\d*\.?\d+$/.test(strValue)) {
+    // lineHeight 可以是无单位数字
+    return strValue
+  }
+
+  return strValue
+}
+
+// 验证样式值是否有效
+export function validateStyleValue(property: string, value: string): boolean {
+  if (!value || value.trim() === '') return true
+
+  const trimmedValue = value.trim()
+
+  // 颜色属性验证
+  const colorProperties = ['color', 'backgroundColor', 'borderColor']
+  if (colorProperties.includes(property)) {
+    // 验证十六进制颜色、RGB、RGBA、HSL、HSLA 或 CSS 颜色名称
+    const colorRegex = /^(#([0-9a-f]{3}|[0-9a-f]{6})|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\)|hsl\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*\)|hsla\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*,\s*(0|1|0?\.\d+)\s*\)|transparent|inherit|initial|unset)$/i
+    const namedColors = ['red', 'blue', 'green', 'yellow', 'black', 'white', 'gray', 'orange', 'purple', 'pink', 'brown']
+    return colorRegex.test(trimmedValue) || namedColors.includes(trimmedValue.toLowerCase())
+  }
+
+  // 数值属性验证（支持负数和小数）
+  const numericProperties = [
+    'width', 'height', 'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
+    'margin', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft',
+    'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+    'fontSize', 'lineHeight', 'letterSpacing',
+    'borderWidth', 'borderRadius',
+    'top', 'right', 'bottom', 'left', 'gap'
+  ]
+
+  if (numericProperties.includes(property)) {
+    // 支持纯数字、带单位的数字、百分比等
+    const numericRegex = /^-?\d*\.?\d+(px|em|rem|%|vh|vw|pt|pc|in|cm|mm|ex|ch|vmin|vmax)?$/i
+    const keywordValues = ['auto', 'inherit', 'initial', 'unset', 'none']
+    return numericRegex.test(trimmedValue) || keywordValues.includes(trimmedValue.toLowerCase())
+  }
+
+  // 枚举属性验证
+  const enumProperties = {
+    display: ['block', 'inline', 'inline-block', 'flex', 'inline-flex', 'grid', 'none', 'table', 'table-cell'],
+    position: ['static', 'relative', 'absolute', 'fixed', 'sticky'],
+    textAlign: ['left', 'center', 'right', 'justify'],
+    fontWeight: ['normal', 'bold', 'lighter', 'bolder', '100', '200', '300', '400', '500', '600', '700', '800', '900'],
+    borderStyle: ['none', 'solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset'],
+    objectFit: ['fill', 'contain', 'cover', 'none', 'scale-down'],
+    flexDirection: ['row', 'column', 'row-reverse', 'column-reverse'],
+    justifyContent: ['flex-start', 'center', 'flex-end', 'space-between', 'space-around', 'space-evenly'],
+    alignItems: ['flex-start', 'center', 'flex-end', 'stretch', 'baseline']
+  }
+
+  if (enumProperties[property as keyof typeof enumProperties]) {
+    return enumProperties[property as keyof typeof enumProperties].includes(trimmedValue.toLowerCase())
+  }
+
+  // 默认通过验证
+  return true
 } 

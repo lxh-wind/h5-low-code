@@ -1,14 +1,15 @@
 'use client'
 
 import React from 'react'
-import { Component } from '@/types/schema'
+import { Component, PageConfig } from '@/types/schema'
 import Image from 'next/image'
 
 interface PreviewRendererProps {
   component: Component
+  pageConfig?: PageConfig
 }
 
-export function PreviewRenderer({ component }: PreviewRendererProps) {
+export function PreviewRenderer({ component, pageConfig }: PreviewRendererProps) {
   const { className } = component
   
   const renderComponent = (component: Component): React.ReactNode => {
@@ -24,8 +25,26 @@ export function PreviewRenderer({ component }: PreviewRendererProps) {
       })
     }
 
-    // 组合样式：内联样式 + 预编译的类名
+    // 构建继承的页面样式
+    const inheritedStyle: React.CSSProperties = {}
+    if (pageConfig) {
+      if (!processedStyle.fontFamily && pageConfig.fontFamily) {
+        inheritedStyle.fontFamily = pageConfig.fontFamily
+      }
+      if (!processedStyle.fontSize && pageConfig.fontSize) {
+        inheritedStyle.fontSize = pageConfig.fontSize
+      }
+      if (!processedStyle.lineHeight && pageConfig.lineHeight) {
+        inheritedStyle.lineHeight = pageConfig.lineHeight
+      }
+      if (!processedStyle.color && pageConfig.color) {
+        inheritedStyle.color = pageConfig.color
+      }
+    }
+
+    // 组合样式：继承样式 + 内联样式 + 预编译的类名
     const inlineStyle: React.CSSProperties = {
+      ...inheritedStyle,
       ...processedStyle,
       boxSizing: 'border-box'
     }
@@ -77,7 +96,7 @@ export function PreviewRenderer({ component }: PreviewRendererProps) {
           <div className={`${className} ${!className ? 'min-h-[50px]' : ''}`} style={inlineStyle}>
             {component.children && component.children.length > 0 ? (
               component.children.map((child: Component) => (
-                <PreviewRenderer key={child.id} component={child} />
+                <PreviewRenderer key={child.id} component={child} pageConfig={pageConfig} />
               ))
             ) : (
               <div className="text-gray-400 text-sm p-4 text-center">
@@ -92,7 +111,7 @@ export function PreviewRenderer({ component }: PreviewRendererProps) {
           <div className={className} style={inlineStyle}>
             {component.children && component.children.length > 0 ? (
               component.children.map((child: Component) => (
-                <PreviewRenderer key={child.id} component={child} />
+                <PreviewRenderer key={child.id} component={child} pageConfig={pageConfig} />
               ))
             ) : (
               <div className="text-gray-400 text-sm p-4 text-center">
@@ -107,7 +126,7 @@ export function PreviewRenderer({ component }: PreviewRendererProps) {
           <div className={`${className} ${!className ? 'bg-white rounded-lg shadow border' : ''}`} style={inlineStyle}>
             {component.children && component.children.length > 0 ? (
               component.children.map((child: Component) => (
-                <PreviewRenderer key={child.id} component={child} />
+                <PreviewRenderer key={child.id} component={child} pageConfig={pageConfig} />
               ))
             ) : (
               <div className="text-gray-400 text-sm p-4 text-center">

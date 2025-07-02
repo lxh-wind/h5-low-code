@@ -6,7 +6,8 @@ import { Component } from '@/types/schema'
 import { useEditorStore } from '@/store/editor'
 import { SelectionBox } from './SelectionBox'
 import { useDroppable } from '@dnd-kit/core'
-import { getComponentConfig } from '@/materials/configs'
+import { getComponentConfig } from '@/materials'
+import { processStyleValue } from '@/lib/utils'
 
 interface ComponentRendererProps {
   component: Component
@@ -22,7 +23,7 @@ export function ComponentRenderer({
   mode = 'editor' // 默认为编辑器模式
 }: ComponentRendererProps) {
   const { type, props, style, children } = component
-  const { selectedComponentId, selectComponent } = useEditorStore()
+  const { selectedComponentId, selectComponent, currentPage } = useEditorStore()
   
   // 为容器组件设置拖拽放置区域
   const config = getComponentConfig(type)
@@ -38,28 +39,7 @@ export function ComponentRenderer({
     },
   })
   
-  // 处理样式值，自动添加单位
-  const processStyleValue = (key: string, value: string): string => {
-    if (!value) return value
-    
-    // 需要添加px单位的属性
-    const pxProperties = [
-      'width', 'height', 'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
-      'margin', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft',
-      'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
-      'fontSize', 'lineHeight', 'letterSpacing',
-      'borderWidth', 'borderRadius',
-      'top', 'right', 'bottom', 'left',
-      'gap'
-    ]
-    
-    // 如果是数字字符串且属性需要px单位，则添加px
-    if (pxProperties.includes(key) && /^\d+(\.\d+)?$/.test(value)) {
-      return `${value}px`
-    }
-    
-    return value
-  }
+  // 使用统一的样式处理函数已在顶部导入
   
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -81,9 +61,30 @@ export function ComponentRenderer({
         })
       }
 
+      // 构建基本样式，包含继承的页面配置
+      const inheritedStyle: React.CSSProperties = {}
+      const pageConfig = currentPage?.config
+      
+      // 如果组件没有设置字体属性，则继承页面配置
+      if (pageConfig) {
+        if (!convertedStyle.fontFamily && pageConfig.fontFamily) {
+          inheritedStyle.fontFamily = pageConfig.fontFamily
+        }
+        if (!convertedStyle.fontSize && pageConfig.fontSize) {
+          inheritedStyle.fontSize = pageConfig.fontSize
+        }
+        if (!convertedStyle.lineHeight && pageConfig.lineHeight) {
+          inheritedStyle.lineHeight = pageConfig.lineHeight
+        }
+        if (!convertedStyle.color && pageConfig.color) {
+          inheritedStyle.color = pageConfig.color
+        }
+      }
+
       const baseStyle: React.CSSProperties = {
         cursor: 'pointer',
         transition: 'all 0.2s',
+        ...inheritedStyle,
         ...convertedStyle
       }
 

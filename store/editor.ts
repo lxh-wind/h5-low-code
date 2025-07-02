@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import { Component, Page, Project } from '@/types/schema'
+import { Component, Page, Project, PageConfig, PageSEO } from '@/types/schema'
 import { styleToTailwind } from '@/lib/utils'
 import { TreeManager, TreeNode } from '@/lib/tree-manager'
 
@@ -86,6 +86,9 @@ interface EditorState {
   // Actions
   setCurrentProject: (project: Project) => void
   setCurrentPage: (page: Page) => void
+  updatePageConfig: (config: Partial<PageConfig>) => void
+  updatePageSEO: (seo: Partial<PageSEO>) => void
+  updatePageInfo: (info: { name?: string; title?: string; description?: string }) => void
   setComponents: (components: Component[]) => void
   addComponent: (component: Component, parentId?: string, index?: number) => void
   updateComponent: (id: string, updates: Partial<Component>) => void
@@ -149,6 +152,48 @@ export const useEditorStore = create<EditorState>()(
         selectedComponentId: null,
         hoveredComponentId: null,
       })
+    },
+    
+    updatePageConfig: (config) => {
+      const { currentPage } = get()
+      if (!currentPage) return
+      
+      const updatedPage = {
+        ...currentPage,
+        config: {
+          ...currentPage.config,
+          ...config
+        },
+        updatedAt: new Date()
+      }
+      set({ currentPage: updatedPage })
+    },
+    
+    updatePageSEO: (seo) => {
+      const { currentPage } = get()
+      if (!currentPage) return
+      
+      const updatedPage = {
+        ...currentPage,
+        seo: {
+          ...currentPage.seo,
+          ...seo
+        },
+        updatedAt: new Date()
+      }
+      set({ currentPage: updatedPage })
+    },
+    
+    updatePageInfo: (info) => {
+      const { currentPage } = get()
+      if (!currentPage) return
+      
+      const updatedPage = {
+        ...currentPage,
+        ...info,
+        updatedAt: new Date()
+      }
+      set({ currentPage: updatedPage })
     },
     
     setComponents: (components) => {

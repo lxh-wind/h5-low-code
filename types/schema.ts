@@ -98,12 +98,40 @@ export const ComponentSchema: z.ZodType<Component> = z.lazy(() => z.object({
   parentId: z.string().optional(),
 }))
 
+// 页面配置schema
+export const PageConfigSchema = z.object({
+  backgroundColor: z.string().optional(),
+  backgroundImage: z.string().optional(),
+  minHeight: z.string().optional(),
+  padding: z.string().optional(),
+  paddingTop: z.string().optional(),
+  paddingBottom: z.string().optional(),
+  paddingLeft: z.string().optional(),
+  paddingRight: z.string().optional(),
+  maxWidth: z.string().optional(),
+  fontFamily: z.string().optional(),
+  fontSize: z.string().optional(),
+  lineHeight: z.string().optional(),
+  color: z.string().optional(),
+})
+
+// 页面SEO schema
+export const PageSEOSchema = z.object({
+  keywords: z.string().optional(),
+  author: z.string().optional(),
+  ogTitle: z.string().optional(),
+  ogDescription: z.string().optional(),
+  ogImage: z.string().optional(),
+})
+
 // 页面schema
 export const PageSchema = z.object({
   id: z.string(),
   name: z.string(),
   title: z.string(),
   description: z.string().optional(),
+  config: PageConfigSchema.optional(),
+  seo: PageSEOSchema.optional(),
   components: z.array(ComponentSchema),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -120,6 +148,8 @@ export const ProjectSchema = z.object({
 })
 
 // 导出类型
+export type PageConfig = z.infer<typeof PageConfigSchema>
+export type PageSEO = z.infer<typeof PageSEOSchema>
 export type Page = z.infer<typeof PageSchema>
 export type Project = z.infer<typeof ProjectSchema>
 

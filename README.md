@@ -160,7 +160,7 @@ npm run dev
 
 2. **创建组件文件**
    - 在 `types/schema.ts` 中添加组件类型
-   - 在 `materials/configs.ts` 中配置组件信息
+   - 在 `materials/components/` 中添加组件配置文件
    - 在对应目录创建组件文件
    - 更新索引文件导出
 

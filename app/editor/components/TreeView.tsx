@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useEditorStore } from '@/store/editor'
 import { Component, ComponentType } from '@/types/schema'
-import { getComponentConfig } from '@/materials/configs'
+import { getComponentConfig } from '@/materials'
 import {
   UncontrolledTreeEnvironment,
   Tree,

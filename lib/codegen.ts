@@ -1,4 +1,4 @@
-import { Component } from '@/types/schema'
+import { Component, Page } from '@/types/schema'
 
 // 样式转换为 TailwindCSS 类名
 function styleToTailwind(style: { [key: string]: string } = {}): string {
@@ -101,20 +101,106 @@ function generateComponentCode(component: Component, indent: number = 0): string
 }
 
 // 生成完整的 React 组件代码
-export function generateReactCode(components: Component[], componentName: string = 'GeneratedPage'): string {
-  const componentBody = components.map(component => generateComponentCode(component, 2)).join('\n')
+export function generateReactCode(page: Page, componentName?: string): string {
+  const pageName = componentName || page.name || 'GeneratedPage'
+  const safeComponentName = pageName.replace(/[^a-zA-Z0-9]/g, '').replace(/^\d/, 'Page$&')
   
-  return `import React from 'react'
+  const componentBody = page.components.map(component => generateComponentCode(component, 2)).join('\n')
+  
+  // 构建页面样式
+  const pageStyle: string[] = []
+  if (page.config) {
+    const config = page.config
+    if (config.backgroundColor) {
+      pageStyle.push(`backgroundColor: '${config.backgroundColor}'`)
+    }
+    if (config.color) {
+      pageStyle.push(`color: '${config.color}'`)
+    }
+    if (config.fontFamily) {
+      pageStyle.push(`fontFamily: '${config.fontFamily}'`)
+    }
+    if (config.fontSize) {
+      pageStyle.push(`fontSize: '${config.fontSize}'`)
+    }
+    if (config.lineHeight) {
+      pageStyle.push(`lineHeight: '${config.lineHeight}'`)
+    }
+    if (config.minHeight) {
+      pageStyle.push(`minHeight: '${config.minHeight}'`)
+    }
+    if (config.padding) {
+      pageStyle.push(`padding: '${config.padding}'`)
+    }
+    if (config.maxWidth) {
+      pageStyle.push(`maxWidth: '${config.maxWidth}'`)
+    }
+  }
+  
+  const pageStyleStr = pageStyle.length > 0 ? `{${pageStyle.join(', ')}}` : '{}'
+  
+  // 生成 SEO meta 標籤
+  const seoTags: string[] = []
+  if (page.seo) {
+    const seo = page.seo
+    if (seo.keywords) {
+      seoTags.push(`        <meta name="keywords" content="${seo.keywords}" />`)
+    }
+    if (seo.author) {
+      seoTags.push(`        <meta name="author" content="${seo.author}" />`)
+    }
+    if (seo.ogTitle) {
+      seoTags.push(`        <meta property="og:title" content="${seo.ogTitle}" />`)
+    }
+    if (seo.ogDescription) {
+      seoTags.push(`        <meta property="og:description" content="${seo.ogDescription}" />`)
+    }
+    if (seo.ogImage) {
+      seoTags.push(`        <meta property="og:image" content="${seo.ogImage}" />`)
+    }
+  }
+  
+  const seoHead = seoTags.length > 0 ? `import Head from 'next/head'
 
-export default function ${componentName}() {
+` : ''
+  
+  const seoSection = seoTags.length > 0 ? `      <Head>
+        <title>${page.title}</title>
+        <meta name="description" content="${page.description || ''}" />
+${seoTags.join('\n')}
+      </Head>
+      ` : ''
+  
+  return `${seoHead}import React from 'react'
+
+export default function ${safeComponentName}() {
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+    <>
+      ${seoSection}<div 
+        style={${pageStyleStr}}
+        className="min-h-screen"
+      >
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
 ${componentBody}
+        </div>
       </div>
-    </div>
+    </>
   )
 }`
+}
+
+// 保持向下兼容的舊函數
+export function generateReactCodeFromComponents(components: Component[], componentName: string = 'GeneratedPage'): string {
+  const mockPage: Page = {
+    id: 'temp',
+    name: componentName,
+    title: componentName,
+    description: '',
+    components,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+  return generateReactCode(mockPage, componentName)
 }
 
 // 生成 TailwindCSS 配置建议

@@ -6,7 +6,7 @@ import { ComponentRenderer } from './ComponentRenderer'
 import { useDroppable } from '@dnd-kit/core'
 
 export function Canvas() {
-  const { getRootComponents, selectedComponentId, selectComponent } = useEditorStore()
+  const { getRootComponents, selectedComponentId, selectComponent, currentPage } = useEditorStore()
   
   // 获取根级组件（只渲染没有父组件的组件）
   const rootComponents = getRootComponents()
@@ -72,10 +72,68 @@ export function Canvas() {
     }
   }, [selectedComponentId, selectComponent])
 
+  // 构建页面样式
+  const getPageStyle = () => {
+    const config = currentPage?.config
+    if (!config) return {}
+
+    const style: React.CSSProperties = {}
+    
+    // 背景相關
+    if (config.backgroundColor) {
+      style.backgroundColor = config.backgroundColor
+    }
+    if (config.backgroundImage) {
+      style.backgroundImage = `url(${config.backgroundImage})`
+      style.backgroundSize = 'cover'
+      style.backgroundPosition = 'center'
+      style.backgroundRepeat = 'no-repeat'
+    }
+    
+    // 尺寸相關
+    if (config.minHeight) {
+      style.minHeight = config.minHeight
+    }
+    
+    // 内边距相关
+    if (config.padding) {
+      style.padding = config.padding
+    } else {
+      if (config.paddingTop) style.paddingTop = config.paddingTop
+      if (config.paddingRight) style.paddingRight = config.paddingRight
+      if (config.paddingBottom) style.paddingBottom = config.paddingBottom
+      if (config.paddingLeft) style.paddingLeft = config.paddingLeft
+    }
+    
+    // 容器宽度
+    if (config.maxWidth) {
+      style.maxWidth = config.maxWidth
+      style.marginLeft = 'auto'
+      style.marginRight = 'auto'
+    }
+    
+    // 字體相關
+    if (config.fontFamily) {
+      style.fontFamily = config.fontFamily
+    }
+    if (config.fontSize) {
+      style.fontSize = config.fontSize
+    }
+    if (config.lineHeight) {
+      style.lineHeight = config.lineHeight
+    }
+    if (config.color) {
+      style.color = config.color
+    }
+    
+    return style
+  }
+
   // 调试信息
   useEffect(() => {
     console.log('Canvas 组件数据:', {
       totalComponents: rootComponents.length,
+      pageConfig: currentPage?.config,
       components: rootComponents.map(c => ({
         id: c.id,
         type: c.type,
@@ -89,20 +147,25 @@ export function Canvas() {
         })) || []
       }))
     })
-  }, [rootComponents])
+  }, [rootComponents, currentPage?.config])
 
   return (
     <div
       ref={setDropRef}
       onClick={handleCanvasClick}
       onMouseDown={handleCanvasMouseDown}
-      className={`min-h-full w-full p-4 transition-colors ${
+      style={getPageStyle()}
+      className={`min-h-full w-full transition-colors ${
         isOver ? 'bg-blue-50 border-2 border-dashed border-blue-300' : ''
-      }`}
+      } ${!currentPage?.config?.padding ? 'p-4' : ''}`}
     >
       {rootComponents.length === 0 ? (
         <div className="flex items-center justify-center h-64 text-gray-400 text-center">
-          <div>
+          <div style={{ 
+            fontFamily: currentPage?.config?.fontFamily || 'system-ui, -apple-system, sans-serif',
+            fontSize: currentPage?.config?.fontSize || '14px',
+            lineHeight: currentPage?.config?.lineHeight || '1.6'
+          }}>
             <div className="text-4xl mb-2">📱</div>
             <p className="text-sm">从左侧拖拽或点击组件来添加到页面</p>
             <p className="text-xs mt-2 opacity-75">选中组件后按 ESC 键可取消选中</p>

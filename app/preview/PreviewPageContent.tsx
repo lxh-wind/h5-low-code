@@ -109,9 +109,23 @@ export function PreviewPageContent() {
                 <p className="text-sm mt-2">请返回编辑器添加组件</p>
               </div>
             ) : (
-              <div className="p-4 space-y-2">
+              <div 
+                style={{
+                  backgroundColor: currentPage?.config?.backgroundColor || '#ffffff',
+                  color: currentPage?.config?.color || '#333333',
+                  fontFamily: currentPage?.config?.fontFamily || 'system-ui, -apple-system, sans-serif',
+                  fontSize: currentPage?.config?.fontSize || '14px',
+                  lineHeight: currentPage?.config?.lineHeight || '1.6',
+                  minHeight: currentPage?.config?.minHeight || 'auto',
+                  padding: currentPage?.config?.padding || '16px',
+                  maxWidth: currentPage?.config?.maxWidth || 'none',
+                  marginLeft: currentPage?.config?.maxWidth ? 'auto' : 'initial',
+                  marginRight: currentPage?.config?.maxWidth ? 'auto' : 'initial',
+                }}
+                className="space-y-2"
+              >
                 {(currentPage?.components || components).map((component: Component) => (
-                  <PreviewRenderer key={component.id} component={component} />
+                  <PreviewRenderer key={component.id} component={component} pageConfig={currentPage?.config} />
                 ))}
               </div>
             )}

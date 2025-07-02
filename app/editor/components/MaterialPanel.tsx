@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { getAllComponentConfigs } from '@/materials/configs'
+import { getAllComponentConfigs } from '@/materials'
 import { ComponentConfig } from '@/types/schema'
 import { useEditorStore } from '@/store/editor'
 import * as Tooltip from '@radix-ui/react-tooltip'

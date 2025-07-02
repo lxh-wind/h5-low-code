@@ -56,6 +56,21 @@ export const mockPage: Page = {
   name: '首页',
   title: '示例页面',
   description: '这是一个示例页面',
+  config: {
+    backgroundColor: '#ffffff',
+    minHeight: '100vh',
+    padding: '20px',
+    fontFamily: 'system-ui, -apple-system, sans-serif',
+    fontSize: '14px',
+    lineHeight: '1.6',
+    color: '#333333'
+  },
+  seo: {
+    keywords: 'H5, 低代码, 编辑器',
+    author: 'H5 Editor',
+    ogTitle: '示例页面',
+    ogDescription: '这是一个H5低代码编辑器生成的示例页面'
+  },
   components: mockComponents,
   createdAt: new Date('2024-01-01T00:00:00Z'),
   updatedAt: new Date('2024-01-01T00:00:00Z')
