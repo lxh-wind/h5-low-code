@@ -2,6 +2,7 @@ import { ExtendedComponentConfig } from '../../types'
 import { commonStyleGroups, layoutStyleGroups } from '../../shared/common-styles'
 
 export const listConfig: ExtendedComponentConfig = {
+  id: 'list',
   type: 'list',
   name: '列表',
   icon: '📋',

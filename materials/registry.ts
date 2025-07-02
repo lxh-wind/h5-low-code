@@ -21,6 +21,9 @@ class ComponentRegistryManager {
       config
     }
 
+    // 清空缓存
+    this._allComponentsCache = null
+
     // 更新分类索引
     if (!this.categories.has(category)) {
       this.categories.set(category, [])
@@ -50,14 +53,27 @@ class ComponentRegistryManager {
     return registration ? registration.config : null
   }
 
+  // 缓存所有组件的结果，避免重复创建对象
+  private _allComponentsCache: { [key: string]: ExtendedComponentConfig } | null = null
+  private _componentsCacheVersion = 0
+
   /**
    * 获取所有组件
    */
   getAllComponents(): { [key: string]: ExtendedComponentConfig } {
+    // 如果缓存存在且版本匹配，直接返回缓存
+    if (this._allComponentsCache && this._componentsCacheVersion === Object.keys(this.registry).length) {
+      return this._allComponentsCache
+    }
+
+    // 重新构建缓存
     const result: { [key: string]: ExtendedComponentConfig } = {}
     Object.keys(this.registry).forEach(key => {
       result[key] = this.registry[key].config
     })
+    
+    this._allComponentsCache = result
+    this._componentsCacheVersion = Object.keys(this.registry).length
     return result
   }
 
@@ -217,6 +233,20 @@ export function getAllComponentTypes(): string[] {
   return Object.keys(componentRegistry.getAllComponents())
 }
 
+// 缓存 getAllComponentConfigs 的结果
+let _configsCache: ExtendedComponentConfig[] | null = null
+let _configsCacheVersion = 0
+
 export function getAllComponentConfigs(): ExtendedComponentConfig[] {
-  return Object.values(componentRegistry.getAllComponents())
+  const currentVersion = Object.keys(componentRegistry.getAllComponents()).length
+  
+  // 如果缓存存在且版本匹配，直接返回缓存
+  if (_configsCache && _configsCacheVersion === currentVersion) {
+    return _configsCache
+  }
+  
+  // 重新构建缓存
+  _configsCache = Object.values(componentRegistry.getAllComponents())
+  _configsCacheVersion = currentVersion
+  return _configsCache
 } 

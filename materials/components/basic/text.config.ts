@@ -2,6 +2,7 @@ import { ExtendedComponentConfig } from '../../types'
 import { commonStyleGroups } from '../../shared/common-styles'
 
 export const textConfig: ExtendedComponentConfig = {
+  id: 'text',
   type: 'text',
   name: '文本',
   icon: '🔤',

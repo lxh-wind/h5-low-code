@@ -1,6 +1,7 @@
 import { ExtendedComponentConfig } from '../../types'
 
 export const spaceConfig: ExtendedComponentConfig = {
+  id: 'space',
   type: 'space',
   name: '间距',
   icon: '⬜',

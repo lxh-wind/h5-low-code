@@ -1,6 +1,7 @@
 import { ExtendedComponentConfig } from '../../types'
 
 export const dividerConfig: ExtendedComponentConfig = {
+  id: 'divider',
   type: 'divider',
   name: '分割线',
   icon: '➖',

@@ -35,8 +35,23 @@ export function getComponentConfig(type: ComponentType): ComponentConfig {
   return config
 }
 
+// 緩存結果避免重複計算
+let _cachedComponentConfigs: ComponentConfig[] | null = null
+let _configCacheVersion = 0
+
 export function getAllComponentConfigs(): ComponentConfig[] {
-  return Object.values(componentRegistry.getAllComponents())
+  const allComponents = componentRegistry.getAllComponents()
+  const currentVersion = Object.keys(allComponents).length
+  
+  // 如果緩存存在且版本匹配，直接返回緩存
+  if (_cachedComponentConfigs && _configCacheVersion === currentVersion) {
+    return _cachedComponentConfigs
+  }
+  
+  // 重新構建緩存
+  _cachedComponentConfigs = Object.values(allComponents)
+  _configCacheVersion = currentVersion
+  return _cachedComponentConfigs
 }
 
 // getExtendedComponentConfig 已经在 registry.ts 中导出，这里重新导出确保可用
@@ -64,7 +79,7 @@ export function getDataComponents() {
   return componentRegistry.getComponentsByCategory('data')
 }
 
-// 自动初始化系统
+// 立即初始化组件系统，确保首次使用时组件已就绪
 initializeComponents().catch(error => {
   console.warn('⚠️ Component system initialization failed:', error)
 }) 

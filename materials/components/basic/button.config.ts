@@ -2,6 +2,7 @@ import { ExtendedComponentConfig } from '../../types'
 import { commonStyleGroups } from '../../shared/common-styles'
 
 export const buttonConfig: ExtendedComponentConfig = {
+  id: 'button',
   type: 'button',
   name: '按钮',
   icon: '🔘',

@@ -2,6 +2,7 @@ import { ExtendedComponentConfig } from '../../types'
 import { commonStyleGroups } from '../../shared/common-styles'
 
 export const inputConfig: ExtendedComponentConfig = {
+  id: 'input',
   type: 'input',
   name: '输入框',
   icon: '📝',

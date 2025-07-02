@@ -2,6 +2,7 @@ import { ExtendedComponentConfig } from '../../types'
 import { commonStyleGroups } from '../../shared/common-styles'
 
 export const imageConfig: ExtendedComponentConfig = {
+  id: 'image',
   type: 'image',
   name: '图片',
   icon: '🖼️',

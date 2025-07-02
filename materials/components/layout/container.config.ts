@@ -2,6 +2,7 @@ import { ExtendedComponentConfig } from '../../types'
 import { commonStyleGroups, layoutStyleGroups } from '../../shared/common-styles'
 
 export const containerConfig: ExtendedComponentConfig = {
+  id: 'container',
   type: 'container',
   name: '容器',
   icon: '📦',

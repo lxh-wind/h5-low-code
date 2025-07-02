@@ -1,8 +1,23 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import * as Tabs from '@radix-ui/react-tabs'
-import { MaterialPanel } from './MaterialPanel'
 import { TreeViewV2 } from './TreeViewV2'
+
+const MaterialPanel = dynamic(
+  () => import('./MaterialPanel').then(mod => mod.MaterialPanel),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="space-y-2 animate-pulse">
+        <div className="h-4 bg-gray-200 rounded"></div>
+        {Array.from({ length: 10 }, (_, i) => (
+          <div key={i} className="h-16 bg-gray-200 rounded"></div>
+        ))}
+      </div>
+    )
+  }
+)
 
 export function LeftPanel() {
   return (

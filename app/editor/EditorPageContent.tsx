@@ -70,20 +70,23 @@ export function EditorPageContent() {
 
   // 初始化编辑器数据
   useEffect(() => {
-    if (pageId) {
-      // 如果有 pageId，加载对应的页面
-      const page = getPageById(pageId)
-      if (page) {
-        setCurrentPage(page)
+    // 使用 requestAnimationFrame 延迟初始化，避免阻塞首次渲染
+    requestAnimationFrame(() => {
+      if (pageId) {
+        // 如果有 pageId，加载对应的页面
+        const page = getPageById(pageId)
+        if (page) {
+          setCurrentPage(page)
+        } else {
+          // 页面不存在，跳转到首页
+          router.push('/')
+        }
       } else {
-        // 页面不存在，跳转到首页
-        router.push('/')
+        // 没有 pageId，使用默认数据
+        const { page } = initializeEditor()
+        setCurrentPage(page)
       }
-    } else {
-      // 没有 pageId，使用默认数据
-      const { page } = initializeEditor()
-      setCurrentPage(page)
-    }
+    })
   }, [pageId, setCurrentPage, getPageById, router])
 
   return (

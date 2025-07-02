@@ -2,6 +2,7 @@ import { ExtendedComponentConfig } from '../../types'
 import { commonStyleGroups } from '../../shared/common-styles'
 
 export const cardConfig: ExtendedComponentConfig = {
+  id: 'card',
   type: 'card',
   name: '卡片',
   icon: '🎴',

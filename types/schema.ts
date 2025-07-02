@@ -155,6 +155,7 @@ export type Project = z.infer<typeof ProjectSchema>
 
 // 组件配置接口
 export interface ComponentConfig {
+  id: string // 添加唯一標識符
   type: ComponentType
   name: string
   icon: string
