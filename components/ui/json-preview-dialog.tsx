@@ -82,7 +82,7 @@ export function JsonPreviewDialog({
     return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="bg-black bg-opacity-50 fixed inset-0 z-50" />
+        <Dialog.Overlay className="bg-black opacity-50 fixed inset-0 z-50" />
         <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg w-[90vw] max-w-4xl h-[80vh] z-50 flex flex-col">
         {/* 对话框标头 */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">

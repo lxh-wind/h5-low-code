@@ -40,9 +40,13 @@ export function Toolbar() {
         toast.error('没有可导出的页面')
         return
       }
+
+      toast.loading('生成导出中', 2000)
       
-      // 显示 JSON 预览对话框
-      setShowJsonPreview(true)
+      setTimeout(()=>{
+        // 显示 JSON 预览对话框
+        setShowJsonPreview(true)
+      }, 2000)
       
     } catch (error) {
       toast.error('JSON 预览失败')
@@ -82,7 +86,9 @@ export function Toolbar() {
         {/* 左侧 - 项目信息 */}
         <div className="flex items-center space-x-4">
           <h1 className="text-lg font-semibold text-gray-900">H5 Low Code Editor</h1>
-          <span className="text-sm text-gray-500">未命名项目</span>
+          <span className="text-sm text-gray-500">
+            {currentPage?.name || '未命名项目'}
+          </span>
         </div>
 
         {/* 中间 - 操作按钮 */}
@@ -184,12 +190,6 @@ export function Toolbar() {
                 导出
               </button>
             </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content className="bg-gray-900 text-white px-2 py-1 rounded text-xs" sideOffset={5}>
-                预览并导出 JSON Schema
-                <Tooltip.Arrow className="fill-gray-900" />
-              </Tooltip.Content>
-            </Tooltip.Portal>
           </Tooltip.Root>
         </div>
       </div>
