@@ -49,6 +49,7 @@ const nextConfig = {
     return config
   },
   images: {
+    unoptimized: true,
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
     remotePatterns: [

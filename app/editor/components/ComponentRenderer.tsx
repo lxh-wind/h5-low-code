@@ -9,6 +9,21 @@ import { useDroppable } from '@dnd-kit/core'
 import { getComponentConfig } from '@/materials'
 import { processStyleValue } from '@/lib/utils'
 
+// 提取重复的空状态拖拽区域组件
+const EmptyDropZone: React.FC<{ isOver: boolean }> = ({ isOver }) => (
+  <div style={{
+    color: isOver ? '#2196f3' : '#9ca3af',
+    fontSize: '14px',
+    padding: '16px',
+    textAlign: 'center',
+    border: isOver ? '2px dashed #2196f3' : '2px dashed #d1d5db',
+    borderRadius: '4px',
+    backgroundColor: isOver ? '#e3f2fd' : 'transparent',
+  }}>
+    {isOver ? '松开鼠标放置组件' : '拖拽组件到这里'}
+  </div>
+)
+
 interface ComponentRendererProps {
   component: Component
   isSelected: boolean
@@ -195,17 +210,7 @@ export function ComponentRenderer({
                   />
                 ))
               ) : (
-                <div style={{
-                  color: isOver ? '#2196f3' : '#9ca3af',
-                  fontSize: '14px',
-                  padding: '16px',
-                  textAlign: 'center',
-                  border: isOver ? '2px dashed #2196f3' : '2px dashed #d1d5db',
-                  borderRadius: '4px',
-                  backgroundColor: isOver ? '#e3f2fd' : 'transparent',
-                }}>
-                  {isOver ? '松开鼠标放置组件' : '拖拽组件到这里'}
-                </div>
+                <EmptyDropZone isOver={isOver} />
               )}
             </div>
           )
@@ -240,17 +245,7 @@ export function ComponentRenderer({
                   />
                 ))
               ) : (
-                <div style={{
-                  color: isOver ? '#2196f3' : '#9ca3af',
-                  fontSize: '14px',
-                  padding: '16px',
-                  textAlign: 'center',
-                  border: isOver ? '2px dashed #2196f3' : '2px dashed #d1d5db',
-                  borderRadius: '4px',
-                  backgroundColor: isOver ? '#e3f2fd' : 'transparent',
-                }}>
-                  {isOver ? '松开鼠标放置组件' : '拖拽组件到这里'}
-                </div>
+                <EmptyDropZone isOver={isOver} />
               )}
             </div>
           )
@@ -288,17 +283,7 @@ export function ComponentRenderer({
                   />
                 ))
               ) : (
-                <div style={{
-                  color: isOver ? '#2196f3' : '#9ca3af',
-                  fontSize: '14px',
-                  padding: '16px',
-                  textAlign: 'center',
-                  border: isOver ? '2px dashed #2196f3' : '2px dashed #d1d5db',
-                  borderRadius: '4px',
-                  backgroundColor: isOver ? '#e3f2fd' : 'transparent',
-                }}>
-                  {isOver ? '松开鼠标放置组件' : '拖拽组件到这里'}
-                </div>
+                <EmptyDropZone isOver={isOver} />
               )}
             </div>
           )
@@ -340,10 +325,6 @@ export function ComponentRenderer({
           )
       }
     }
-
-    // 预览模式：使用 TailwindCSS（后续实现）
-    // TODO: 预览模式的实现
-    return <div>预览模式待实现</div>
   }
 
   // 编辑器模式下使用 SelectionBox

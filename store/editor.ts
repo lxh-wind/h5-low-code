@@ -97,6 +97,7 @@ interface EditorState {
   selectComponent: (id: string | null) => void
   setHoveredComponent: (id: string | null) => void
   moveComponent: (dragId: string, hoverId: string, position: 'before' | 'after' | 'inside') => void
+  copyComponent: (id: string) => void
   
   // 自動保存設置
   setAutoSave: (autoSave: boolean) => void
@@ -680,5 +681,55 @@ export const useEditorStore = create<EditorState>()(
 
     // 自動保存設置
     setAutoSave: (autoSave) => set({ autoSave }),
+
+    copyComponent: (id) => {
+      const { components, generateUniqueId, treeManager } = get()
+      const component = get().getComponentById(id)
+      
+      if (!component) return
+      
+      // 递归复制组件及其子组件
+      const copyComponentWithChildren = (comp: Component): Component => {
+        const newId = generateUniqueId()
+        
+        const copiedComponent: Component = {
+          ...comp,
+          id: newId,
+          parentId: comp.parentId
+        }
+        
+        // 递归复制子组件
+        if (comp.children && comp.children.length > 0) {
+          copiedComponent.children = comp.children.map(child => copyComponentWithChildren(child))
+        }
+        
+        return copiedComponent
+      }
+      
+      const copiedComponent = copyComponentWithChildren(component)
+      
+      // 如果有父组件，则添加到父组件的 children 中
+      if (component.parentId) {
+        const parentComponent = get().getComponentById(component.parentId)
+        if (parentComponent) {
+          // 找到原组件在父组件中的位置，复制的组件插入到其后
+          const parentChildren = parentComponent.children || []
+          const originalIndex = parentChildren.findIndex(child => child.id === id)
+          const insertIndex = originalIndex + 1
+          
+          get().addComponent(copiedComponent, component.parentId, insertIndex)
+        }
+      } else {
+        // 如果是根组件，则添加到根级别
+        const rootComponents = components.filter(comp => !comp.parentId)
+        const originalIndex = rootComponents.findIndex(comp => comp.id === id)
+        const insertIndex = originalIndex + 1
+        
+        get().addComponent(copiedComponent, undefined, insertIndex)
+      }
+      
+      // 选中新复制的组件
+      set({ selectedComponentId: copiedComponent.id })
+    },
   }))
 ) 

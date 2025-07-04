@@ -20,7 +20,7 @@ interface ToolbarState {
 }
 
 export function SelectionBox({ children, componentId, isSelected, componentName }: SelectionBoxProps) {
-  const { deleteComponent } = useEditorStore()
+  const { deleteComponent, copyComponent, moveComponent, getComponentById, components } = useEditorStore()
   const containerRef = useRef<HTMLDivElement>(null)
   const [toolbarState, setToolbarState] = useState<ToolbarState>({ 
     top: 0, 
@@ -64,7 +64,7 @@ export function SelectionBox({ children, componentId, isSelected, componentName 
     }
     
     // 水平位置边界检查
-    const toolbarWidth = 180
+    const toolbarWidth = 220 // 增加宽度以容纳更多按钮
     if (left + toolbarWidth > viewportWidth - 10) {
       left = Math.max(10, viewportWidth - toolbarWidth - 10)
     }
@@ -138,9 +138,27 @@ export function SelectionBox({ children, componentId, isSelected, componentName 
     }
   }, [isSelected, handleScroll, calculateToolbarPosition])
 
+  // 检查组件是否可以移动
+  const getComponentMoveInfo = () => {
+    const component = getComponentById(componentId)
+    if (!component) return { canMoveUp: false, canMoveDown: false }
+    
+    // 获取同级组件
+    const siblings = component.parentId 
+      ? getComponentById(component.parentId)?.children || []
+      : components.filter(comp => !comp.parentId)
+    
+    const currentIndex = siblings.findIndex(sibling => sibling.id === componentId)
+    
+    return {
+      canMoveUp: currentIndex > 0,
+      canMoveDown: currentIndex < siblings.length - 1
+    }
+  }
+
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation()
-    // TODO: 实现复制功能
+    copyComponent(componentId)
   }
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -148,13 +166,50 @@ export function SelectionBox({ children, componentId, isSelected, componentName 
     deleteComponent(componentId)
   }
 
-  const handleMove = (e: React.MouseEvent) => {
+  const handleMoveUp = (e: React.MouseEvent) => {
     e.stopPropagation()
-    // TODO: 实现移动功能
+    
+    const component = getComponentById(componentId)
+    if (!component) return
+    
+    // 获取同级组件
+    const siblings = component.parentId 
+      ? getComponentById(component.parentId)?.children || []
+      : components.filter(comp => !comp.parentId)
+    
+    const currentIndex = siblings.findIndex(sibling => sibling.id === componentId)
+    
+    // 如果不是第一个，则与前一个交换位置
+    if (currentIndex > 0) {
+      const previousSibling = siblings[currentIndex - 1]
+      moveComponent(componentId, previousSibling.id, 'before')
+    }
+  }
+
+  const handleMoveDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    
+    const component = getComponentById(componentId)
+    if (!component) return
+    
+    // 获取同级组件
+    const siblings = component.parentId 
+      ? getComponentById(component.parentId)?.children || []
+      : components.filter(comp => !comp.parentId)
+    
+    const currentIndex = siblings.findIndex(sibling => sibling.id === componentId)
+    
+    // 如果不是最后一个，则与后一个交换位置
+    if (currentIndex < siblings.length - 1) {
+      const nextSibling = siblings[currentIndex + 1]
+      moveComponent(componentId, nextSibling.id, 'after')
+    }
   }
 
   const renderToolbar = () => {
     if (!toolbarState.visible || !isMounted) return null
+
+    const { canMoveUp, canMoveDown } = getComponentMoveInfo()
 
     return createPortal(
       <div 
@@ -192,22 +247,53 @@ export function SelectionBox({ children, componentId, isSelected, componentName 
             </Tooltip.Portal>
           </Tooltip.Root>
 
-          {/* 移动按钮 */}
+          {/* 向上移动按钮 */}
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
               <button
-                onClick={handleMove}
-                className="w-6 h-6 flex items-center justify-center text-white hover:bg-blue-600 rounded transition-colors"
-                aria-label="移动组件"
+                onClick={canMoveUp ? handleMoveUp : undefined}
+                disabled={!canMoveUp}
+                className={`w-6 h-6 flex items-center justify-center text-white rounded transition-colors ${
+                  canMoveUp 
+                    ? 'hover:bg-blue-600 cursor-pointer' 
+                    : 'opacity-50 cursor-not-allowed'
+                }`}
+                aria-label="向上移动"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                 </svg>
               </button>
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content className="bg-gray-900 text-white px-2 py-1 rounded text-xs" sideOffset={5}>
-                移动组件
+                {canMoveUp ? '向上移动' : '已在顶部'}
+                <Tooltip.Arrow className="fill-gray-900" />
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+
+          {/* 向下移动按钮 */}
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <button
+                onClick={canMoveDown ? handleMoveDown : undefined}
+                disabled={!canMoveDown}
+                className={`w-6 h-6 flex items-center justify-center text-white rounded transition-colors ${
+                  canMoveDown 
+                    ? 'hover:bg-blue-600 cursor-pointer' 
+                    : 'opacity-50 cursor-not-allowed'
+                }`}
+                aria-label="向下移动"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content className="bg-gray-900 text-white px-2 py-1 rounded text-xs" sideOffset={5}>
+                {canMoveDown ? '向下移动' : '已在底部'}
                 <Tooltip.Arrow className="fill-gray-900" />
               </Tooltip.Content>
             </Tooltip.Portal>
