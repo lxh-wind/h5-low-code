@@ -1,0 +1,46 @@
+---
+description: 测试和验证设计系统规则的应用
+---
+
+# 测试和验证规则
+
+## 设计系统规则测试
+
+当需要测试或验证设计系统规则时使用此规则。
+
+### 验证要点
+
+1. **颜色使用**
+
+   - 确保使用了 primary 色系: primary-50, primary-500, primary-600, primary-700
+   - 确保使用了正确的灰度系统: gray-50 到 gray-900
+   - 验证状态颜色: green, blue, purple, orange 系统
+
+2. **组件结构**
+
+   - 验证组件 Props 接口包含 children, className
+   - 确保使用了 React.FC<Props> 类型
+   - 检查是否使用了 useMemo, useCallback 进行优化
+
+3. **样式模式**
+
+   - 验证卡片样式: bg-white rounded-lg border border-gray-200 shadow-sm
+   - 检查按钮样式变体是否正确
+   - 确保响应式布局使用了正确的容器类
+
+4. **TypeScript 类型**
+   - 验证接口定义是否遵循命名约定
+   - 检查泛型使用是否合理
+   - 确保错误处理类型定义正确
+
+### 测试场景
+
+用于验证新组件或修改是否符合 established 设计系统规范。
+
+当创建新组件时，参考以下检查清单：
+
+- [ ] 使用了正确的颜色令牌
+- [ ] 遵循了组件结构模式
+- [ ] 应用了适当的 TypeScript 类型
+- [ ] 符合响应式设计原则
+- [ ] 包含必要的可访问性属性

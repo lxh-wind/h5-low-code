@@ -124,9 +124,9 @@ export function PageListItem({ page }: PageListItemProps) {
               variant="outline"
               size="sm"
               onClick={handleEdit}
-              leftIcon={<ExternalLink className="w-3 h-3" />}
               className="text-xs"
             >
+              <ExternalLink className="w-3 h-3" />
               编辑
             </Button>
 

@@ -6,7 +6,6 @@ const nextConfig = {
   assetPrefix: basePath + '/',
   trailingSlash: true,
   experimental: {
-    appDir: true,
     turbo: {
       rules: {
         '*.svg': {

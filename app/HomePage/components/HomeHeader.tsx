@@ -40,7 +40,7 @@ export function HomeHeader({
               </div>
               <div>
                 <h1 className="text-xl font-semibold text-gray-900">
-                  H5 低代码编辑器
+                  H5搭建 - 编辑器
                 </h1>
                 {isLoading || !isMounted ? (
                   <Skeleton className="h-4 w-32 mt-1" />
@@ -58,21 +58,21 @@ export function HomeHeader({
             <Button
               variant="ghost"
               onClick={onOpenTemplateLibrary}
-              leftIcon={<BookOpen className="w-4 h-4" />}
             >
+              <BookOpen className="w-4 h-4" />
               模板库
             </Button>
             <Button
               variant="ghost"
               onClick={onImportTemplate}
-              leftIcon={<Upload className="w-4 h-4" />}
             >
+              <Upload className="w-4 h-4" />
               导入模板
             </Button>
             <Button
               onClick={onCreatePage}
-              leftIcon={<Plus className="w-4 h-4" />}
             >
+              <Plus className="w-4 h-4" />
               新建页面
             </Button>
           </div>

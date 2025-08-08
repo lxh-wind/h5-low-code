@@ -169,12 +169,15 @@ export function PageManagement({
             <>
               {/* 搜索框 */}
               <div className="flex-1">
-                <Input
-                  placeholder="搜索页面名称、标题或描述..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  leftIcon={<Search className="w-4 h-4" />}
-                />
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="搜索页面名称、标题或描述..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
               </div>
 
               {/* 排序选择 */}
@@ -253,9 +256,9 @@ export function PageManagement({
                 <Button
                   onClick={onCreatePage}
                   size="lg"
-                  leftIcon={<Plus className="w-5 h-5" />}
                   className="shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
+                  <Plus className="w-5 h-5" />
                   创建第一个页面
                 </Button>
               </div>

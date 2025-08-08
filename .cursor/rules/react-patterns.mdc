@@ -1,0 +1,273 @@
+---
+globs: src/components/**/*.tsx,src/components/**/*.jsx,src/**/*.tsx,src/**/*.jsx
+description: React 组件开发模式和最佳实践
+---
+
+# React 组件开发模式
+
+## 组件架构模式
+
+### 组件接口设计
+
+```typescript
+// 标准组件 Props 接口
+interface ComponentProps {
+  children?: React.ReactNode;
+  className?: string;
+  // 具体业务 props
+  variant?: "primary" | "secondary";
+  size?: "sm" | "md" | "lg";
+  disabled?: boolean;
+  onClick?: () => void;
+}
+
+// 使用泛型的组件接口
+interface ListProps<T> {
+  items: T[];
+  renderItem: (item: T) => React.ReactNode;
+  keyExtractor: (item: T) => string;
+}
+```
+
+### 组件实现模式
+
+```typescript
+// 标准函数组件结构
+export const Component: React.FC<ComponentProps> = ({
+  children,
+  className = "",
+  variant = "primary",
+  ...props
+}) => {
+  // 状态管理
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 计算属性
+  const computedClassName = useMemo(() => {
+    return `base-class ${variantStyles[variant]} ${className}`;
+  }, [variant, className]);
+
+  // 事件处理
+  const handleClick = useCallback(() => {
+    // 事件处理逻辑
+  }, []);
+
+  // 副作用
+  useEffect(() => {
+    // 副作用逻辑
+  }, []);
+
+  return (
+    <div className={computedClassName} {...props}>
+      {children}
+    </div>
+  );
+};
+```
+
+## 状态管理模式
+
+### 本地状态管理
+
+```typescript
+// 使用 useState 管理简单状态
+const [isOpen, setIsOpen] = useState(false);
+const [query, setQuery] = useState("");
+
+// 使用 useReducer 管理复杂状态
+interface State {
+  items: Item[];
+  loading: boolean;
+  error: string | null;
+}
+
+type Action =
+  | { type: "FETCH_START" }
+  | { type: "FETCH_SUCCESS"; payload: Item[] }
+  | { type: "FETCH_ERROR"; payload: string };
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case "FETCH_START":
+      return { ...state, loading: true, error: null };
+    case "FETCH_SUCCESS":
+      return { ...state, loading: false, items: action.payload };
+    case "FETCH_ERROR":
+      return { ...state, loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
+```
+
+## 性能优化模式
+
+### 记忆化优化
+
+```typescript
+// 使用 React.memo 优化组件重渲染
+export const OptimizedComponent = React.memo<ComponentProps>(
+  ({ data, onItemClick }) => {
+    return (
+      <div>
+        {data.map((item) => (
+          <ItemComponent key={item.id} item={item} onClick={onItemClick} />
+        ))}
+      </div>
+    );
+  }
+);
+
+// 使用 useMemo 优化计算
+const expensiveValue = useMemo(() => {
+  return computeExpensiveValue(props.data);
+}, [props.data]);
+
+// 使用 useCallback 优化函数引用
+const handleClick = useCallback(
+  (id: string) => {
+    onItemClick(id);
+  },
+  [onItemClick]
+);
+```
+
+### 懒加载模式
+
+```typescript
+// 组件懒加载
+const LazyComponent = React.lazy(() => import("./HeavyComponent"));
+
+// 在组件中使用
+<Suspense fallback={<LoadingSpinner />}>
+  <LazyComponent />
+</Suspense>;
+```
+
+## 自定义 Hook 模式
+
+### 逻辑复用 Hook
+
+```typescript
+// 通用的数据获取 Hook
+export const useFetch = <T>(url: string) => {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(url);
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [url]);
+
+  return { data, loading, error };
+};
+
+// 本地存储 Hook
+export const useLocalStorage = <T>(key: string, initialValue: T) => {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      return initialValue;
+    }
+  });
+
+  const setValue = useCallback(
+    (value: T | ((val: T) => T)) => {
+      try {
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      } catch (error) {
+        console.error("Error setting localStorage:", error);
+      }
+    },
+    [key, storedValue]
+  );
+
+  return [storedValue, setValue] as const;
+};
+```
+
+## 错误处理模式
+
+### 错误边界组件
+
+```typescript
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+export class ErrorBoundary extends React.Component<
+  React.PropsWithChildren<{}>,
+  ErrorBoundaryState
+> {
+  constructor(props: React.PropsWithChildren<{}>) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("Error caught by boundary:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="error-fallback">
+          <h2>出现了错误</h2>
+          <p>{this.state.error?.message}</p>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+```
+
+### 异步操作错误处理
+
+```typescript
+const useAsyncOperation = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const execute = useCallback(async (operation: () => Promise<void>) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await operation();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { loading, error, execute };
+};
+```
+
+这些模式帮助创建可维护、可测试和高性能的 React 组件。

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { ToastProvider } from '@/components/ui'
+import { ToastProviderWithState } from '@/components/ui/toast'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -18,9 +18,9 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className={inter.className} suppressHydrationWarning={true}>
-        <ToastProvider position="top-center">
+        <ToastProviderWithState>
           {children}
-        </ToastProvider>
+        </ToastProviderWithState>
       </body>
     </html>
   )

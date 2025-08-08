@@ -1,0 +1,337 @@
+---
+globs: **/*.ts,**/*.tsx
+description: TypeScript 类型定义、泛型和高级类型模式
+---
+
+# TypeScript 高级类型模式
+
+## 类型定义模式
+
+### 基础接口定义
+
+```typescript
+// 基础数据模型接口
+interface User {
+  readonly id: string;
+  name: string;
+  email: string;
+  age?: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// 扩展接口
+interface AdminUser extends User {
+  role: "admin";
+  permissions: Permission[];
+}
+
+// 组合接口
+interface UserWithProfile {
+  user: User;
+  profile: UserProfile;
+}
+```
+
+### 泛型类型模式
+
+```typescript
+// 通用 API 响应类型
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+  errors?: string[];
+}
+
+// 分页响应类型
+interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+// 状态管理类型
+interface AsyncState<T, E = string> {
+  data: T | null;
+  loading: boolean;
+  error: E | null;
+}
+```
+
+### 实用类型模式
+
+```typescript
+// 联合类型
+type Status = "pending" | "loading" | "success" | "error";
+type Theme = "light" | "dark" | "auto";
+
+// 映射类型
+type Partial<T> = {
+  [P in keyof T]?: T[P];
+};
+
+type Required<T> = {
+  [P in keyof T]-?: T[P];
+};
+
+// 条件类型
+type NonNullable<T> = T extends null | undefined ? never : T;
+
+// 模板字面量类型
+type EventName<T extends string> = `on${Capitalize<T>}`;
+type Color = "red" | "blue" | "green";
+type ColorStyle = `${Color}-${100 | 200 | 300 | 400 | 500}`;
+```
+
+## React 相关类型模式
+
+### 组件类型定义
+
+```typescript
+// 基础组件 Props
+interface BaseComponentProps {
+  children?: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+  "data-testid"?: string;
+}
+
+// 带泛型的列表组件
+interface ListComponentProps<T> extends BaseComponentProps {
+  items: T[];
+  renderItem: (item: T, index: number) => React.ReactNode;
+  keyExtractor: (item: T) => string | number;
+  emptyMessage?: string;
+}
+
+// 表单组件类型
+interface FormFieldProps<T> extends BaseComponentProps {
+  name: keyof T;
+  label: string;
+  value: T[keyof T];
+  onChange: (value: T[keyof T]) => void;
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+}
+```
+
+### Hook 类型定义
+
+```typescript
+// 自定义 Hook 返回类型
+interface UseAsyncReturn<T, E = Error> {
+  data: T | null;
+  loading: boolean;
+  error: E | null;
+  execute: () => Promise<void>;
+  reset: () => void;
+}
+
+// 表单 Hook 类型
+interface UseFormReturn<T> {
+  values: T;
+  errors: Partial<Record<keyof T, string>>;
+  touched: Partial<Record<keyof T, boolean>>;
+  setValue: <K extends keyof T>(field: K, value: T[K]) => void;
+  setError: <K extends keyof T>(field: K, error: string) => void;
+  validate: () => boolean;
+  reset: () => void;
+  isValid: boolean;
+  isDirty: boolean;
+}
+```
+
+## 高级类型技巧
+
+### 类型守卫
+
+```typescript
+// 基本类型守卫
+function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
+function isUser(obj: unknown): obj is User {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    "id" in obj &&
+    "name" in obj &&
+    "email" in obj
+  );
+}
+
+// 区分联合类型
+function isApiError(
+  response: ApiResponse<any>
+): response is ApiResponse<never> & { success: false } {
+  return !response.success;
+}
+```
+
+### 类型断言和收窄
+
+```typescript
+// 安全的类型断言
+function assertIsUser(obj: unknown): asserts obj is User {
+  if (!isUser(obj)) {
+    throw new Error("Expected User object");
+  }
+}
+
+// 使用 in 操作符收窄类型
+function handleEvent(event: MouseEvent | KeyboardEvent) {
+  if ("key" in event) {
+    // event 现在是 KeyboardEvent
+    console.log(event.key);
+  } else {
+    // event 现在是 MouseEvent
+    console.log(event.button);
+  }
+}
+```
+
+### 类型工具函数
+
+```typescript
+// 深度 Partial
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
+// 选择特定键的类型
+type Pick<T, K extends keyof T> = {
+  [P in K]: T[P];
+};
+
+// 排除特定键的类型
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+// 提取函数参数类型
+type Parameters<T extends (...args: any) => any> = T extends (
+  ...args: infer P
+) => any
+  ? P
+  : never;
+
+// 提取函数返回类型
+type ReturnType<T extends (...args: any) => any> = T extends (
+  ...args: any
+) => infer R
+  ? R
+  : any;
+```
+
+## 错误处理类型模式
+
+### Result 类型模式
+
+```typescript
+// Result 类型用于错误处理
+type Result<T, E = Error> =
+  | { success: true; data: T }
+  | { success: false; error: E };
+
+// 使用示例
+async function fetchUser(id: string): Promise<Result<User, string>> {
+  try {
+    const user = await api.getUser(id);
+    return { success: true, data: user };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+// Option 类型模式
+type Option<T> = T | null | undefined;
+
+function findUser(id: string): Option<User> {
+  return users.find((user) => user.id === id) ?? null;
+}
+```
+
+### 异常类型定义
+
+```typescript
+// 自定义错误类型
+class ValidationError extends Error {
+  constructor(message: string, public field: string, public code: string) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
+class ApiError extends Error {
+  constructor(message: string, public status: number, public code?: string) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+// 错误联合类型
+type AppError = ValidationError | ApiError | Error;
+```
+
+## 配置和常量类型
+
+### 配置类型定义
+
+```typescript
+// 应用配置类型
+interface AppConfig {
+  readonly api: {
+    readonly baseUrl: string;
+    readonly timeout: number;
+    readonly retries: number;
+  };
+  readonly features: {
+    readonly analytics: boolean;
+    readonly darkMode: boolean;
+    readonly notifications: boolean;
+  };
+  readonly theme: {
+    readonly primaryColor: string;
+    readonly secondaryColor: string;
+    readonly borderRadius: number;
+  };
+}
+
+// 环境配置
+type Environment = "development" | "staging" | "production";
+
+interface EnvConfig {
+  readonly NODE_ENV: Environment;
+  readonly API_URL: string;
+  readonly DEBUG: boolean;
+}
+```
+
+### 常量类型安全
+
+```typescript
+// 使用 as const 确保类型安全
+const COLORS = {
+  primary: "#3b82f6",
+  secondary: "#6b7280",
+  success: "#10b981",
+  warning: "#f59e0b",
+  error: "#ef4444",
+} as const;
+
+type ColorKey = keyof typeof COLORS;
+type ColorValue = (typeof COLORS)[ColorKey];
+
+// 状态机类型
+const STATES = ["idle", "loading", "success", "error"] as const;
+type State = (typeof STATES)[number];
+```
+
+这些 TypeScript 模式确保类型安全、代码可维护性和开发体验。

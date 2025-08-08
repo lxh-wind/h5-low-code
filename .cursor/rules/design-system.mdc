@@ -1,0 +1,386 @@
+---
+alwaysApply: true
+description: 项目设计系统、设计模式和设计令牌规范
+---
+
+# 设计系统规范
+
+## 设计令牌 (Design Tokens)
+
+### 颜色系统
+
+- **主色调 (Primary)**: 使用 blue 色调系统
+
+  - `primary-50`: #eff6ff (最浅)
+  - `primary-500`: #3b82f6 (标准)
+  - `primary-600`: #2563eb (悬停)
+  - `primary-700`: #1d4ed8 (按下)
+
+- **灰度系统**: 使用语义化的灰度命名
+  - `gray-50`: #f9fafb (背景)
+  - `gray-100`: #f3f4f6 (浅背景)
+  - `gray-200`: #e5e7eb (边框)
+  - `gray-300`: #d1d5db (分隔线)
+  - `gray-400`: #9ca3af (占位符)
+  - `gray-500`: #6b7280 (次要文本)
+  - `gray-600`: #4b5563 (图标)
+  - `gray-700`: #374151 (主要文本)
+  - `gray-800`: #1f2937 (标题)
+  - `gray-900`: #111827 (强调)
+
+### 字体系统
+
+- **系统字体栈**: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
+- **等宽字体**: ui-monospace, SFMono-Regular, Monaco, Consolas, Liberation Mono, Courier New, monospace
+
+### 间距系统
+
+- 使用 Tailwind CSS 的间距系统 (4px 基准单位)
+- 常用间距: 2, 4, 8, 12, 16, 20, 24, 32px
+
+## 组件设计模式
+
+### 卡片组件模式
+
+```typescript
+// 卡片结构模式
+interface CardProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+// 标准卡片样式
+className =
+  "bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow";
+```
+
+### 按钮组件模式
+
+```typescript
+// 按钮变体系统
+interface ButtonProps {
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "sm" | "md" | "lg";
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+// 主要按钮样式
+("bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100");
+
+// 次要按钮样式
+("bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100");
+```
+
+### 状态指示器模式
+
+```typescript
+// 分类标签系统
+const categoryColors: Record<Category, string> = {
+  always: "bg-green-100 text-green-800 border-green-200",
+  "auto-attached": "bg-blue-100 text-blue-800 border-blue-200",
+  "agent-requested": "bg-purple-100 text-purple-800 border-purple-200",
+  manual: "bg-orange-100 text-orange-800 border-orange-200",
+};
+```
+
+### 搜索和过滤模式
+
+```typescript
+// 搜索输入框样式
+"block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm";
+
+// 过滤器按钮样式
+"px-3 py-1 rounded-full text-xs font-medium border transition-colors";
+```
+
+## 布局设计模式
+
+### 容器系统
+
+- **最大宽度容器**: `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`
+- **响应式间距**: 使用 `px-4 sm:px-6 lg:px-8` 模式
+- **垂直间距**: `py-8` 用于主要内容区域
+
+### 网格系统
+
+- **侧边栏布局**: `flex gap-8` 用于主内容区域
+- **固定侧边栏**: `flex-shrink-0` + `w-80`
+- **弹性主内容**: `flex-1`
+
+### 响应式设计
+
+- 移动优先设计原则
+- 断点: sm (640px), md (768px), lg (1024px), xl (1280px)
+
+## 交互设计模式
+
+### 动画和过渡
+
+- **标准过渡**: `transition-colors` 用于颜色变化
+- **阴影过渡**: `hover:shadow-md transition-shadow`
+- **状态反馈**: 2 秒自动重置 (如复制确认)
+
+### 可访问性模式
+
+- **焦点环**: `focus:ring-2 focus:ring-primary-500`
+- **颜色对比**: 确保至少 4.5:1 的对比度
+- **键盘导航**: 使用 `tabindex` 和语义化 HTML
+
+### 反馈机制
+
+- **成功状态**: 绿色系统 (`bg-green-100 text-green-800`)
+- **信息状态**: 蓝色系统 (`bg-blue-100 text-blue-800`)
+- **警告状态**: 橙色系统 (`bg-orange-100 text-orange-800`)
+
+## 图标使用规范
+
+### 图标库
+
+- 使用 Lucide React 图标库
+- 标准尺寸: `h-4 w-4` (16px), `h-5 w-5` (20px)
+- 图标颜色: 继承父元素或使用语义化颜色
+
+### 常用图标映射
+
+- 搜索: `Search`
+- 过滤: `Filter`
+- 清除: `X`
+- 展开/收起: `ChevronDown`, `ChevronUp`
+- 复制: `Copy`
+- 确认: `Check`
+- 文件夹: `Folder`, `FolderOpen`
+- 文件: `FileText`
+- 标签: `Tag`
+- 全局: `Globe`
+
+## 代码风格规范
+
+### 组件结构
+
+```typescript
+// 标准组件接口定义
+interface ComponentProps {
+  children?: React.ReactNode;
+  className?: string;
+  // 其他具体 props
+}
+
+// 组件实现模式
+export const Component: React.FC<ComponentProps> = ({
+  children,
+  className = "",
+  ...props
+}) => {
+  return (
+    <div className={`base-styles ${className}`} {...props}>
+      {children}
+    </div>
+  );
+};
+```
+
+### 样式组织
+
+- 使用对象形式管理样式映射
+- 条件样式使用模板字符串和三元运算符
+- 优先使用 Tailwind 工具类，避免自定义 CSS
+
+### 状态管理
+
+- 使用 `useState` 管理组件本地状态
+- 使用 `useMemo` 优化计算密集型操作
+- 事件处理函数使用 `handle` 前缀命名
+
+这些规范确保项目的视觉一致性、用户体验一致性和代码可维护性。
+
+# 设计系统规范
+
+## 设计令牌 (Design Tokens)
+
+### 颜色系统
+
+- **主色调 (Primary)**: 使用 blue 色调系统
+
+  - `primary-50`: #eff6ff (最浅)
+  - `primary-500`: #3b82f6 (标准)
+  - `primary-600`: #2563eb (悬停)
+  - `primary-700`: #1d4ed8 (按下)
+
+- **灰度系统**: 使用语义化的灰度命名
+  - `gray-50`: #f9fafb (背景)
+  - `gray-100`: #f3f4f6 (浅背景)
+  - `gray-200`: #e5e7eb (边框)
+  - `gray-300`: #d1d5db (分隔线)
+  - `gray-400`: #9ca3af (占位符)
+  - `gray-500`: #6b7280 (次要文本)
+  - `gray-600`: #4b5563 (图标)
+  - `gray-700`: #374151 (主要文本)
+  - `gray-800`: #1f2937 (标题)
+  - `gray-900`: #111827 (强调)
+
+### 字体系统
+
+- **系统字体栈**: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
+- **等宽字体**: ui-monospace, SFMono-Regular, Monaco, Consolas, Liberation Mono, Courier New, monospace
+
+### 间距系统
+
+- 使用 Tailwind CSS 的间距系统 (4px 基准单位)
+- 常用间距: 2, 4, 8, 12, 16, 20, 24, 32px
+
+## 组件设计模式
+
+### 卡片组件模式
+
+```typescript
+// 卡片结构模式
+interface CardProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+// 标准卡片样式
+className =
+  "bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow";
+```
+
+### 按钮组件模式
+
+```typescript
+// 按钮变体系统
+interface ButtonProps {
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "sm" | "md" | "lg";
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+// 主要按钮样式
+("bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100");
+
+// 次要按钮样式
+("bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100");
+```
+
+### 状态指示器模式
+
+```typescript
+// 分类标签系统
+const categoryColors: Record<Category, string> = {
+  always: "bg-green-100 text-green-800 border-green-200",
+  "auto-attached": "bg-blue-100 text-blue-800 border-blue-200",
+  "agent-requested": "bg-purple-100 text-purple-800 border-purple-200",
+  manual: "bg-orange-100 text-orange-800 border-orange-200",
+};
+```
+
+### 搜索和过滤模式
+
+```typescript
+// 搜索输入框样式
+"block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm";
+
+// 过滤器按钮样式
+"px-3 py-1 rounded-full text-xs font-medium border transition-colors";
+```
+
+## 布局设计模式
+
+### 容器系统
+
+- **最大宽度容器**: `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`
+- **响应式间距**: 使用 `px-4 sm:px-6 lg:px-8` 模式
+- **垂直间距**: `py-8` 用于主要内容区域
+
+### 网格系统
+
+- **侧边栏布局**: `flex gap-8` 用于主内容区域
+- **固定侧边栏**: `flex-shrink-0` + `w-80`
+- **弹性主内容**: `flex-1`
+
+### 响应式设计
+
+- 移动优先设计原则
+- 断点: sm (640px), md (768px), lg (1024px), xl (1280px)
+
+## 交互设计模式
+
+### 动画和过渡
+
+- **标准过渡**: `transition-colors` 用于颜色变化
+- **阴影过渡**: `hover:shadow-md transition-shadow`
+- **状态反馈**: 2 秒自动重置 (如复制确认)
+
+### 可访问性模式
+
+- **焦点环**: `focus:ring-2 focus:ring-primary-500`
+- **颜色对比**: 确保至少 4.5:1 的对比度
+- **键盘导航**: 使用 `tabindex` 和语义化 HTML
+
+### 反馈机制
+
+- **成功状态**: 绿色系统 (`bg-green-100 text-green-800`)
+- **信息状态**: 蓝色系统 (`bg-blue-100 text-blue-800`)
+- **警告状态**: 橙色系统 (`bg-orange-100 text-orange-800`)
+
+## 图标使用规范
+
+### 图标库
+
+- 使用 Lucide React 图标库
+- 标准尺寸: `h-4 w-4` (16px), `h-5 w-5` (20px)
+- 图标颜色: 继承父元素或使用语义化颜色
+
+### 常用图标映射
+
+- 搜索: `Search`
+- 过滤: `Filter`
+- 清除: `X`
+- 展开/收起: `ChevronDown`, `ChevronUp`
+- 复制: `Copy`
+- 确认: `Check`
+- 文件夹: `Folder`, `FolderOpen`
+- 文件: `FileText`
+- 标签: `Tag`
+- 全局: `Globe`
+
+## 代码风格规范
+
+### 组件结构
+
+```typescript
+// 标准组件接口定义
+interface ComponentProps {
+  children?: React.ReactNode;
+  className?: string;
+  // 其他具体 props
+}
+
+// 组件实现模式
+export const Component: React.FC<ComponentProps> = ({
+  children,
+  className = "",
+  ...props
+}) => {
+  return (
+    <div className={`base-styles ${className}`} {...props}>
+      {children}
+    </div>
+  );
+};
+```
+
+### 样式组织
+
+- 使用对象形式管理样式映射
+- 条件样式使用模板字符串和三元运算符
+- 优先使用 Tailwind 工具类，避免自定义 CSS
+
+### 状态管理
+
+- 使用 `useState` 管理组件本地状态
+- 使用 `useMemo` 优化计算密集型操作
+- 事件处理函数使用 `handle` 前缀命名
+
+这些规范确保项目的视觉一致性、用户体验一致性和代码可维护性。

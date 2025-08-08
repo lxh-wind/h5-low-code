@@ -8,5 +8,16 @@ export * from './common'
 // 布局组件 - 页面布局和结构相关组件
 export * from './layout'
 
+// 核心编辑器组件
+export { Canvas } from './canvas'
+export { ComponentPanel } from './component-panel'
+export { PropertyPanel } from './property-panel'
+export { LayerPanel } from './layer-panel'
+export { Toolbar } from './toolbar'
+export { ComponentRenderer } from './component-renderer'
+export { AlignmentGuides } from './alignment-guides'
+export { AnimatedComponent } from './animated-component'
+export { PreviewPage } from './preview-page'
+
 // UI组件库 - 基础UI组件 (shadcn/ui)
 export * from './ui' 

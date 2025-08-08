@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { EventConfig } from './event-types'
 
 // 基础组件类型
 export const ComponentTypes = [
@@ -19,6 +20,13 @@ export type ComponentType = typeof ComponentTypes[number]
 export const StyleSchema = z.object({
   width: z.string().optional(),
   height: z.string().optional(),
+  // 定位
+  position: z.string().optional(),
+  top: z.string().optional(),
+  left: z.string().optional(),
+  right: z.string().optional(),
+  bottom: z.string().optional(),
+  zIndex: z.string().optional(),
   // 外边距
   margin: z.string().optional(),
   marginTop: z.string().optional(),
@@ -70,6 +78,30 @@ export const ComponentPropsSchema = z.object({
   type: z.string().optional(),
 })
 
+// 动画配置类型
+export interface AnimationConfig {
+  entrance?: {
+    type: string
+    duration: number
+    delay: number
+    easing: string
+  }
+  hover?: {
+    type: string
+    duration: number
+    scale?: number
+    rotate?: number
+    translateX?: number
+    translateY?: number
+  }
+  click?: {
+    type: string
+    duration: number
+    scale?: number
+    rotate?: number
+  }
+}
+
 // 先定义基础类型
 export type Style = z.infer<typeof StyleSchema>
 export type ComponentProps = z.infer<typeof ComponentPropsSchema>
@@ -82,6 +114,8 @@ export interface Component {
   props: ComponentProps
   style: Style
   className?: string // 新增：预编译的 TailwindCSS 类名
+  events?: EventConfig[] // 新增：事件配置
+  animations?: AnimationConfig // 新增：动画配置
   children?: Component[]
   parentId?: string
 }
@@ -159,6 +193,7 @@ export interface ComponentConfig {
   type: ComponentType
   name: string
   icon: string
+  category?: string // 组件分类
   defaultProps: ComponentProps
   defaultStyle: Style
   canHaveChildren: boolean
