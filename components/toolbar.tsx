@@ -6,6 +6,7 @@ import { Save, Undo, Redo, Eye } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/toast"
+import { usePageNavigation } from "@/hooks/useNavigation"
 import type { Component } from "@/types/schema"
 
 interface ToolbarProps {
@@ -15,6 +16,7 @@ interface ToolbarProps {
 export function Toolbar({ pageId }: ToolbarProps) {
   const { components, canUndo, canRedo, undo, redo } = useEditor()
   const { updatePage, getPageById, createPage } = usePageStore()
+  const { openPreview } = usePageNavigation()
   const [isClient, setIsClient] = useState(false)
   const toast = useToast()
 
@@ -113,17 +115,9 @@ export function Toolbar({ pageId }: ToolbarProps) {
       console.log("预览数据保存:", saveResult.title)
       console.log("组件数量:", components.length)
 
-      // 构建预览URL，包含pageId参数以便预览页面能够找到对应数据
-      const previewUrl = pageId ? `/preview?pageId=${pageId}` : `/preview`
-
-      // 在新窗口中打开预览
-      const previewWindow = window.open(previewUrl, "_blank", "width=375,height=667,scrollbars=yes,resizable=yes")
-      if (previewWindow) {
-        // 尝试调整窗口大小以模拟移动设备
-        setTimeout(() => {
-          previewWindow.resizeTo(375, 667)
-        }, 100)
-      } else {
+      // 使用公共跳转方法打开预览
+      const previewWindow = openPreview(pageId || undefined)
+      if (!previewWindow) {
         toast.error('无法打开预览窗口', '请检查浏览器是否阻止了弹窗')
       }
     } catch (error) {

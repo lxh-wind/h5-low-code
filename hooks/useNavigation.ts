@@ -98,7 +98,7 @@ export function useNavigation() {
     getCurrentAbsoluteUrl,
     goBack,
     goForward,
-    basePath: getBasePath()
+    getBasePath
   }
 }
 
@@ -106,7 +106,7 @@ export function useNavigation() {
  * 页面跳转相关的 hooks
  */
 export function usePageNavigation() {
-  const { openInNewTab, navigateTo, getAbsoluteUrl } = useNavigation()
+  const { openInNewTab, navigateTo, getAbsoluteUrl, getBasePath } = useNavigation()
 
   /**
    * 打开编辑器页面
@@ -117,12 +117,32 @@ export function usePageNavigation() {
   }, [openInNewTab])
 
   /**
-   * 打开预览页面
+   * 打开预览页面（移动端窗口模式）
    */
   const openPreview = useCallback((pageId?: string) => {
+    if (typeof window === 'undefined') return
+    
     const path = pageId ? `/preview?pageId=${pageId}` : '/preview'
-    openInNewTab(path)
-  }, [openInNewTab])
+    const origin = window.location.origin
+    const basePath = getBasePath()
+    const fullUrl = `${origin}${basePath}${path}`
+    
+    // 在新窗口中打开预览，设置移动设备尺寸
+    const previewWindow = window.open(
+      fullUrl, 
+      "_blank", 
+      "width=375,height=667,scrollbars=yes,resizable=yes"
+    )
+    
+    if (previewWindow) {
+      // 尝试调整窗口大小以模拟移动设备
+      setTimeout(() => {
+        previewWindow.resizeTo(375, 667)
+      }, 100)
+    }
+    
+    return previewWindow
+  }, [getBasePath])
 
   /**
    * 导航到首页

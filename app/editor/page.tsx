@@ -237,7 +237,7 @@ const EditorLoading = () => (
   <div className="h-screen flex items-center justify-center bg-gray-50">
     <div className="text-center">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-      <p className="text-gray-600">載入編輯器中...</p>
+      <p className="text-gray-600">加载编辑器中...</p>
     </div>
   </div>
 )

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, Suspense } from "react"
 import type { ComponentData } from "@/store/editor"
 import { usePageStore } from "@/store/pages"
 import Head from "next/head"
@@ -8,13 +8,16 @@ import { useEventManager } from "@/hooks/use-event-manager"
 import { AnimatedComponent } from "./animated-component"
 import ComponentFactory from "./shared/component-factory"
 import { pxToVw, convertStyleUnits } from "@/lib/unit-converter"
+import { useSearchParams } from "next/navigation"
 
-export function PreviewPage() {
+function PreviewContent() {
   const [components, setComponents] = useState<ComponentData[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { executeComponentEvent } = useEventManager()
   const { getPageById } = usePageStore()
+  const searchParams = useSearchParams()
+  const pageId = searchParams.get('pageId')
   
   // 计算预览页面的内容高度 - 使用vw单位适配
   const previewContentHeight = useMemo(() => {
@@ -51,9 +54,6 @@ export function PreviewPage() {
     const loadComponents = () => {
       try {
         console.log("开始加载预览数据...")
-        
-        const urlParams = new URLSearchParams(window.location.search)
-        const pageId = urlParams.get("pageId")
         
         if (!pageId) {
           console.log("缺少 pageId 参数")
@@ -104,7 +104,7 @@ export function PreviewPage() {
 
     const timer = setTimeout(loadComponents, 100)
     return () => clearTimeout(timer)
-  }, [])
+  }, [pageId, getPageById])
 
 
 
@@ -250,5 +250,23 @@ export function PreviewPage() {
         }
       `}</style>
     </>
+  )
+}
+
+// 預覽加載組件
+const PreviewLoading = () => (
+  <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="text-center">
+      <div className="text-4xl mb-4">⏳</div>
+      <p className="text-gray-600">正在加载预览...</p>
+    </div>
+  </div>
+)
+
+export function PreviewPage() {
+  return (
+    <Suspense fallback={<PreviewLoading />}>
+      <PreviewContent />
+    </Suspense>
   )
 }
