@@ -8,23 +8,13 @@ import { useEditor } from "@/store/editor"
 import { usePageStore } from "@/store/pages"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState, useRef, useCallback, Suspense } from "react"
+import { usePageNavigation } from "@/hooks/useNavigation"
 
 // 样式常量
 const PANEL_STYLES = {
   left: "min-w-80 max-w-80 flex-shrink-0 bg-white border-r border-gray-200",
   right: "min-w-90 max-w-90 flex-shrink-0 bg-white border-l border-gray-200"
 } as const
-
-// 工具函数
-const parseStorageData = (data: string | null): any[] | null => {
-  if (!data) return null
-  try {
-    const parsed = JSON.parse(data)
-    return Array.isArray(parsed) ? parsed : null
-  } catch {
-    return null
-  }
-}
 
 // 加载状态组件
 const PanelSkeleton = () => (
@@ -36,48 +26,52 @@ const PanelSkeleton = () => (
 )
 
 // 无页面ID引导组件
-const NoPageIdGuide = () => (
-  <div className="h-screen flex items-center justify-center bg-gray-50">
-    <div className="max-w-md mx-auto text-center p-8">
-      <div className="w-16 h-16 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
-        <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      </div>
-      
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">
-        需要选择页面才能开始编辑
-      </h1>
-      
-      <p className="text-gray-600 mb-8">
-        请从首页选择要编辑的页面，或者创建一个新页面开始您的设计之旅
-      </p>
-      
-      <div className="space-y-3">
-        <button
-          onClick={() => window.location.href = '/HomePage'}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-        >
-          返回首页
-        </button>
+const NoPageIdGuide = () => {
+  const { goToHomePage } = usePageNavigation()
+  
+  return (
+    <div className="h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-md mx-auto text-center p-8">
+        <div className="w-16 h-16 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
+          <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
         
-        <button
-          onClick={() => window.location.href = '/HomePage'}
-          className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-        >
-          创建新页面
-        </button>
-      </div>
-      
-      <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <h3 className="font-medium text-blue-900 mb-2">💡 提示</h3>
-        <p className="text-sm text-blue-700">
-          编辑器需要与具体页面关联才能正常工作，这样可以确保您的设计内容得到妥善保存
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          需要选择页面才能开始编辑
+        </h1>
+        
+        <p className="text-gray-600 mb-8">
+          请从首页选择要编辑的页面，或者创建一个新页面开始您的设计之旅
         </p>
+        
+        <div className="space-y-3">
+          <button
+            onClick={goToHomePage}
+            className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          >
+            返回首页
+          </button>
+          
+          <button
+            onClick={goToHomePage}
+            className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+          >
+            创建新页面
+          </button>
+        </div>
+        
+        <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+          <h3 className="font-medium text-blue-900 mb-2">💡 提示</h3>
+          <p className="text-sm text-blue-700">
+            编辑器需要与具体页面关联才能正常工作，这样可以确保您的设计内容得到妥善保存
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-)
+  )
+}
 
 // 编辑器布局组件
 const EditorLayout = ({ 
