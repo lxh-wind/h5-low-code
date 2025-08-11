@@ -6,7 +6,7 @@
 export type EventType = 'click' | 'dblclick' | 'mousedown' | 'mouseup' | 'mouseover' | 'mouseout' | 'touchstart' | 'touchend' | 'longpress'
 
 // 事件动作类型
-export type EventActionType = 'navigate' | 'showModal' | 'hideModal' | 'showToast' | 'executeScript' | 'sendRequest' | 'toggleElement' | 'playAnimation' | 'custom'
+export type EventActionType = 'navigate' | 'showModal' | 'hideModal' | 'showToast' | 'executeScript' | 'sendRequest' | 'toggleElement' | 'playAnimation' | 'copyText' | 'showMessage' | 'custom'
 
 // 事件动作配置
 export interface EventAction {

@@ -36,7 +36,7 @@ export function PhoneFrame({
         {/* 状态栏 */}
         <div 
           className="absolute top-0 left-0 right-0 flex items-center justify-between px-6 pt-2 text-black text-sm font-medium z-20 bg-white"
-          style={{ height: `${currentDevice.safeAreaTop}px` }}
+          style={{ height: `${currentDevice.safeAreaTop || 20}px` }}
         >
           <span>{currentTime}</span>
           <div className="flex items-center space-x-1">
@@ -58,7 +58,7 @@ export function PhoneFrame({
         {/* 页面标题栏 */}
         <div 
           className="absolute left-0 right-0 h-12 bg-white border-b border-gray-200 flex items-center justify-between px-4 z-10"
-          style={{ top: `${currentDevice.safeAreaTop}px` }}
+          style={{ top: `${currentDevice.safeAreaTop || 20}px` }}
         >
           <h1 className="text-lg font-medium text-gray-900">{title}</h1>
           <div className="flex items-center space-x-2">
@@ -75,19 +75,19 @@ export function PhoneFrame({
         <div 
           className="absolute left-0 right-0 bg-white overflow-y-auto"
           style={{ 
-            top: `${currentDevice.safeAreaTop + 48}px`, // 状态栏高度 + 标题栏高度
-            bottom: `${currentDevice.safeAreaBottom}px`,
-            height: `${currentDevice.height - currentDevice.safeAreaTop - 48 - currentDevice.safeAreaBottom}px`
+            top: `${(currentDevice.safeAreaTop || 20) + 48}px`, // 状态栏高度 + 标题栏高度
+            bottom: `${currentDevice.safeAreaBottom || 0}px`,
+            height: `${currentDevice.height - (currentDevice.safeAreaTop || 20) - 48 - (currentDevice.safeAreaBottom || 0)}px`
           }}
         >
           {children}
         </div>
         
         {/* 底部安全区域 - Home指示器 */}
-        {currentDevice.safeAreaBottom > 0 && (
+        {(currentDevice.safeAreaBottom || 0) > 0 && (
           <div 
             className="absolute bottom-0 left-0 right-0 bg-white flex items-center justify-center z-10"
-            style={{ height: `${currentDevice.safeAreaBottom}px` }}
+            style={{ height: `${currentDevice.safeAreaBottom || 0}px` }}
           >
             {/* Home指示器 */}
             <div className="w-32 h-1 bg-black rounded-full opacity-60"></div>

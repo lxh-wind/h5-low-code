@@ -76,11 +76,12 @@ export function AnimationPanel() {
 
   const updateAnimation = (category: string, key: string, value: any) => {
     const currentAnimations = selectedComponent.animations || {}
+    const categoryAnimations = currentAnimations[category as keyof typeof currentAnimations] || {}
     updateComponent(selectedComponent.id, {
       animations: {
         ...currentAnimations,
         [category]: {
-          ...currentAnimations[category],
+          ...categoryAnimations,
           [key]: value,
         },
       },

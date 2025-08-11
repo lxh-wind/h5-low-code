@@ -7,7 +7,7 @@ import { LayerPanel } from "@/components/layer-panel"
 import { useEditor } from "@/store/editor"
 import { usePageStore } from "@/store/pages"
 import { useSearchParams } from "next/navigation"
-import { useEffect, useState, useRef, useCallback } from "react"
+import { useEffect, useState, useRef, useCallback, Suspense } from "react"
 
 // 样式常量
 const PANEL_STYLES = {
@@ -238,6 +238,20 @@ function EditorContent() {
   return <EditorLayout isLoading={!isClient} pageId={pageId} />
 }
 
+// 加載回退組件
+const EditorLoading = () => (
+  <div className="h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p className="text-gray-600">載入編輯器中...</p>
+    </div>
+  </div>
+)
+
 export default function LowCodeEditor() {
-  return <EditorContent />
+  return (
+    <Suspense fallback={<EditorLoading />}>
+      <EditorContent />
+    </Suspense>
+  )
 }

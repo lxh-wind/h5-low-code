@@ -7,11 +7,14 @@ export const ComponentTypes = [
   'button', 
   'image',
   'input',
+  'textarea',
   'container',
   'list',
   'card',
   'divider',
-  'space'
+  'space',
+  'video',
+  'audio'
 ] as const
 
 export type ComponentType = typeof ComponentTypes[number]

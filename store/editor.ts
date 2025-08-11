@@ -2,10 +2,70 @@
 
 import { create } from 'zustand'
 import type { EventConfig } from "@/types/event-types"
+import type { ComponentType } from "@/types/schema"
+
+interface DeviceConfig {
+  id: string
+  name: string
+  width: number
+  height: number
+  hasNotch?: boolean
+  safeAreaTop?: number
+  safeAreaBottom?: number
+}
+
+// 設備配置
+export const DEVICE_CONFIGS: DeviceConfig[] = [
+  { 
+    id: 'iphone-se', 
+    name: 'iPhone SE', 
+    width: 375, 
+    height: 667,
+    hasNotch: false,
+    safeAreaTop: 20,
+    safeAreaBottom: 0
+  },
+  { 
+    id: 'iphone-12', 
+    name: 'iPhone 12', 
+    width: 390, 
+    height: 844,
+    hasNotch: true,
+    safeAreaTop: 47,
+    safeAreaBottom: 34
+  },
+  { 
+    id: 'iphone-14-pro', 
+    name: 'iPhone 14 Pro', 
+    width: 393, 
+    height: 852,
+    hasNotch: true,
+    safeAreaTop: 59,
+    safeAreaBottom: 34
+  },
+  { 
+    id: 'android-small', 
+    name: 'Android (小屏)', 
+    width: 360, 
+    height: 640,
+    hasNotch: false,
+    safeAreaTop: 24,
+    safeAreaBottom: 0
+  },
+  { 
+    id: 'android-medium', 
+    name: 'Android (中屏)', 
+    width: 414, 
+    height: 736,
+    hasNotch: false,
+    safeAreaTop: 24,
+    safeAreaBottom: 0
+  },
+]
 
 export interface ComponentData {
   id: string
-  type: string
+  type: ComponentType
   name?: string // 组件自定义名称
   locked?: boolean // 组件锁定状态
   props: Record<string, any>
@@ -54,6 +114,7 @@ interface EditorState {
   selectedId: string | null
   pageConfig: PageConfig
   isCanvasSelected: boolean
+  currentDevice: DeviceConfig
   
   // 历史记录管理
   history: HistoryState[]
@@ -66,6 +127,7 @@ interface EditorState {
   setSelectedId: (id: string | null) => void
   setPageConfig: (config: Partial<PageConfig>) => void
   setIsCanvasSelected: (selected: boolean) => void
+  setCurrentDevice: (device: DeviceConfig) => void
   clearSelection: () => void
   addComponent: (component: ComponentData) => void
   updateComponent: (id: string, updates: Partial<ComponentData>) => void
@@ -84,6 +146,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     components: [],
   selectedId: null,
   isCanvasSelected: false,
+  currentDevice: DEVICE_CONFIGS[0], // 默認選擇第一個設備
   pageConfig: {
     title: "未命名H5页面",
     description: "H5页面描述",
@@ -119,6 +182,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (selected) {
       set({ selectedId: null })
     }
+  },
+
+  setCurrentDevice: (device) => {
+    set({ currentDevice: device })
   },
 
   clearSelection: () => {
@@ -269,12 +336,14 @@ export function useEditor() {
     selectedId: store.selectedId,
     pageConfig: store.pageConfig,
     isCanvasSelected: store.isCanvasSelected,
+    currentDevice: store.currentDevice,
     canUndo: store.canUndo,
     canRedo: store.canRedo,
     setComponents: store.setComponents,
     setSelectedId: store.setSelectedId,
     setPageConfig: store.setPageConfig,
     setIsCanvasSelected: store.setIsCanvasSelected,
+    setCurrentDevice: store.setCurrentDevice,
     clearSelection: store.clearSelection,
     addComponent: store.addComponent,
     updateComponent: store.updateComponent,

@@ -5,9 +5,6 @@
 // 通用组件 - 可复用的基础组件
 export * from './common'
 
-// 布局组件 - 页面布局和结构相关组件
-export * from './layout'
-
 // 核心编辑器组件
 export { Canvas } from './canvas'
 export { ComponentPanel } from './component-panel'

@@ -5,26 +5,20 @@ import { Page } from '@/types/schema'
 /**
  * 获取实时页面数据的自定义 Hook
  * 
- * 该 Hook 将 currentPage 的基本信息与画布中的实时组件数据合并，
- * 确保返回的页面数据始终包含最新的组件状态
+ * 注意：目前暫時禁用，因為缺少當前頁面管理功能
+ * TODO: 需要配合頁面管理系統實現當前頁面狀態
  * 
- * @returns 包含实时组件数据的页面对象，如果没有当前页面则返回 null
+ * @returns 暫時返回 null，待實現當前頁面管理後啟用
  */
 export function useRealTimePageData(): Page | null {
-  const { currentPage, components } = useEditorStore()
+  const { components } = useEditorStore()
 
   const realTimePageData = useMemo(() => {
-    if (!currentPage) {
-      return null
-    }
-
-    // 合并页面基本信息和实时组件数据
-    return {
-      ...currentPage,
-      components, // 使用画布的实时组件数据
-      updatedAt: new Date(), // 更新时间戳，确保数据新鲜度
-    }
-  }, [currentPage, components])
+    // TODO: 實現當前頁面管理後，這裡應該合併頁面基本信息和實時組件數據
+    // 暫時返回 null
+    console.log('實時頁面數據功能待實現，組件數量:', components.length)
+    return null
+  }, [components])
 
   return realTimePageData
 }
